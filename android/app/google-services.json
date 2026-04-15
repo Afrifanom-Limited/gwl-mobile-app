@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1014745690021",
+    "project_id": "gwcl-752e8",
+    "storage_bucket": "gwcl-752e8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1014745690021:android:e5fd7fe3a547dbd949c24c",
+        "android_client_info": {
+          "package_name": "com.afrifanom.gwcl"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1014745690021-jdg1cglk48clbpgj7d2kskf8i2mva6f5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPnMTwAUpnNSE16vLpq3ixmJ9Tccya9fc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1014745690021-jdg1cglk48clbpgj7d2kskf8i2mva6f5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1014745690021-14quhi39g2h64iqcijitmrrcf863g0n8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.afrifanom.gwcl",
+                "app_store_id": "1568116192"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
