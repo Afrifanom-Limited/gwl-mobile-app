@@ -122,7 +122,9 @@ class _AddMeterState extends State<AddMeter> {
               content: "Kindly check and ensure that your device location is turned on",
               confirmText: "Okay",
               confirmTextColor: Constants.kPrimaryColor,
-              confirm: AppSettings.openLocationSettings,
+              confirm: () {
+                AppSettings.openAppSettings(type: AppSettingsType.location);
+              },
             ),
           );
         } else {

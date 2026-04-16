@@ -16,7 +16,7 @@ class ScreenRouter extends StatefulWidget {
   _ScreenRouterState createState() => _ScreenRouterState();
 }
 
-class _ScreenRouterState extends State<ScreenRouter> with AuthStateListener {
+class _ScreenRouterState extends State<ScreenRouter> implements AuthStateListener {
   _ScreenRouterState() {
     var authStateProvider = new AuthStateProvider();
     authStateProvider.subscribe(this);
