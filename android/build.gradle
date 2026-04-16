@@ -5,7 +5,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        // Must match the pluginManagement version in settings.gradle.
+        classpath 'com.android.tools.build:gradle:8.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.4.2'
     }
@@ -25,6 +26,10 @@ allprojects {
                     if (namespace == null) {
                         namespace project.group
                     }
+                    compileOptions {
+                        sourceCompatibility = JavaVersion.VERSION_11
+                        targetCompatibility = JavaVersion.VERSION_11
+                    }
                 }
             }
         }
@@ -41,4 +46,14 @@ subprojects {
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
+}
+
+// Keep Kotlin bytecode target aligned with Java (11) for all Android subprojects.
+// This prevents JVM target mismatches inside transitive plugins.
+subprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { task ->
+        task.kotlinOptions {
+            jvmTarget = "11"
+        }
+    }
 }
