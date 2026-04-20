@@ -292,8 +292,33 @@ launchURL(String url) async {
 
 callLauncher(String phoneNumber) async {
   try {
-    Uri uri = Uri.parse(phoneNumber);
-    await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
+    final raw = phoneNumber.trim().replaceFirst(RegExp(r'^tel:'), '');
+    final normalized = raw.replaceAll(RegExp(r'[^0-9+]'), '');
+    final dialNumber = normalized.startsWith('0')
+        ? normalized.replaceFirst(RegExp(r'^0'), '+233')
+        : normalized;
+    final uri = Uri(scheme: 'tel', path: dialNumber);
+    print("URI: $uri");
+
+    // For iOS, prefer external application and fall back to telprompt.
+    if (Platform.isIOS) {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        final promptUri = Uri.parse('telprompt:$dialNumber');
+        final promptLaunched = await launchUrl(promptUri, mode: LaunchMode.externalApplication);
+        if (!promptLaunched) {
+          throw 'Could not launch $uri';
+        }
+      }
+      return;
+    }
+
+    if (await canLaunchUrl(uri)) {
+      print("Launching URL: $uri");
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $uri';
+    }
   } catch (e) {
     print(e);
   }
@@ -357,8 +382,19 @@ Future logout(BuildContext context) async {
     var _phoneNumber = _localStorage.getString('localAuthPhone');
     // Unsubscribe from notification service
     FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-    firebaseMessaging.unsubscribeFromTopic(_phoneNumber!);
-    firebaseMessaging.unsubscribeFromTopic(Constants.appId);
+    if (_phoneNumber != null && _phoneNumber.isNotEmpty) {
+      // On iOS, topic operations require APNs token.
+      if (!Platform.isIOS) {
+        await firebaseMessaging.unsubscribeFromTopic(_phoneNumber);
+        await firebaseMessaging.unsubscribeFromTopic(Constants.appId);
+      } else {
+        final apnsToken = await firebaseMessaging.getAPNSToken();
+        if (apnsToken != null && apnsToken.isNotEmpty) {
+          await firebaseMessaging.unsubscribeFromTopic(_phoneNumber);
+          await firebaseMessaging.unsubscribeFromTopic(Constants.appId);
+        }
+      }
+    }
 
     await _localStorage.clear();
     await _localDb.deleteAllOtherTables();

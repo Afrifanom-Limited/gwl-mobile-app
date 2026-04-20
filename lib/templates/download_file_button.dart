@@ -7,7 +7,7 @@ import 'package:gwcl/helpers/Constants.dart';
 import 'package:gwcl/helpers/Endpoints.dart';
 import 'package:gwcl/helpers/Functions.dart';
 import 'package:gwcl/helpers/ProgressDialog.dart';
-import 'package:open_file_plus/open_file_plus.dart';
+import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../mixpanel.dart';
@@ -50,7 +50,8 @@ class _DownloadFileButtonState extends State<DownloadFileButton> {
         var fileFullPath = "$path$fileName";
         File f = File(fileFullPath);
         if (f.existsSync()) {
-          OpenFile.open(f.path, type: "application/pdf", uti: "com.adobe.pdf");
+          OpenFile.open(f.path, type: "application/pdf");
+          //  mimeType: "com.adobe.pdf");
           return;
         }
         String fileUrl;

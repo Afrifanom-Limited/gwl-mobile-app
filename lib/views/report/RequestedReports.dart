@@ -21,7 +21,7 @@ import 'package:gwcl/templates/Dialogs.dart';
 import 'package:gwcl/views/report/Report.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:open_file_plus/open_file_plus.dart';
+import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../mixpanel.dart';
@@ -299,7 +299,8 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
       _getDirectoryPath().then((path) {
         File f = File(path + "$_extension");
         if (f.existsSync()) {
-          OpenFile.open(f.path, type: "application/pdf", uti: "com.adobe.pdf");
+          OpenFile.open(f.path, type: "application/pdf");
+          //  mimeType: "com.adobe.pdf");
           return;
         }
         _downloadFile(_url, "$path/$_extension");

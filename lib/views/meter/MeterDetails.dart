@@ -26,7 +26,7 @@ import 'package:gwcl/views/meter/EditMeterEmailAddress.dart';
 import 'package:gwcl/views/meter/EditSecondaryPhoneNumber.dart';
 import 'package:gwcl/views/transactions/PayBill.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:open_file_plus/open_file_plus.dart';
+import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../mixpanel.dart';
@@ -544,7 +544,8 @@ class _MeterDetailsState extends State<MeterDetails> {
     _getDirectoryPath().then((path) {
       File f = File(path + "$_extension");
       if (f.existsSync()) {
-        OpenFile.open(f.path, type: "application/pdf", uti: "com.adobe.pdf");
+        OpenFile.open(f.path, type: "application/pdf");
+        //  mimeType: "com.adobe.pdf");
         return;
       }
       _downloadFile(_url, "$path/$_extension", actualPath: pdfPath);

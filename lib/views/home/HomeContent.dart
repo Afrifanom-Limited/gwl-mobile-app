@@ -68,6 +68,7 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
   late Payment _payment;
   bool? _showQuickAccess;
   var _localDb = new LocalDatabase();
+  bool _newFeedsAvailable = false;
 
   _loadMeters() async {
     setState(() => _loadingLocalMeters = true);
@@ -156,6 +157,7 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
         Timer(new Duration(seconds: 1), () {
           if (mounted) setState(() => _loadingPaymentHistory = true);
           RestDataSource _request = new RestDataSource();
+          if(!context.mounted) return;
           _request.get(context, url: Endpoints.payment_history).then((Map response) async {
             if (mounted) setState(() => _loadingPaymentHistory = false);
             if (response[Constants.success]) {
@@ -201,6 +203,12 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      // Once the Live Updates tab is opened, clear the blinking indicator.
+      if (_tabController.index == 1 && _newFeedsAvailable) {
+        if (mounted) setState(() => _newFeedsAvailable = false);
+      }
+    });
     _loadMeters();
     _loadVendors();
     super.initState();
@@ -243,11 +251,15 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
                       textFont: Constants.kFont,
                     ),
                     Constants.kSizeWidth_5,
-                    BlinkingWidget(
-                      widget: Icon(
-                        Icons.circle,
-                        size: 8.sp,
-                        color: Colors.green,
+                    Visibility(
+                      // show the blinking circle if new feeds are available
+                      visible: _newFeedsAvailable == true,
+                      child: BlinkingWidget(
+                        widget: Icon(
+                          Icons.circle,
+                          size: 8.sp,
+                          color: Colors.green,
+                        ),
                       ),
                     )
                   ],
@@ -260,7 +272,19 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
       //Announcements
       body: TabBarView(
         controller: _tabController,
-        children: [_activitySection(), Feeds()],
+        children: [
+          _activitySection(),
+          Feeds(
+            newFeedsAvailable: _newFeedsAvailable,
+            onNewFeedsAvailable: (bool hasNewFeeds) {
+              // Do not show blinking state while user is already on the feeds tab.
+              if (_tabController.index == 1) return;
+              if (mounted && _newFeedsAvailable != hasNewFeeds) {
+                setState(() => _newFeedsAvailable = hasNewFeeds);
+              }
+            },
+          ),
+        ],
       ),
     );
   }
