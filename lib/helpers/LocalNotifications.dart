@@ -5,18 +5,30 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LocalNotification {
-  static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   static void initialize() async {
     final InitializationSettings initialSettings = InitializationSettings(
-      android: AndroidInitializationSettings(
-        '@mipmap/ic_launcher',
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      iOS: DarwinInitializationSettings(
+        requestSoundPermission: true,
+        requestBadgePermission: true,
+        requestAlertPermission: true,
+        defaultPresentBadge: true,
+        defaultPresentSound: true,
       ),
-      iOS: DarwinInitializationSettings(requestSoundPermission: true, requestBadgePermission: true, requestAlertPermission: true, defaultPresentBadge: true, defaultPresentSound: true),
     );
-    flutterLocalNotificationsPlugin.initialize(initialSettings, onDidReceiveNotificationResponse: (NotificationResponse details) {});
+    flutterLocalNotificationsPlugin.initialize(
+      initialSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse details) {},
+    );
 
     if (Platform.isIOS) {
-      await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(
             alert: true,
             badge: true,
             sound: true,
@@ -63,10 +75,18 @@ class LocalNotification {
         interruptionLevel: InterruptionLevel.critical,
       ),
     );
+    // Use a stable, wide range for the id so near-simultaneous pushes don't
+    // collide (and therefore overwrite each other). Prefer the FCM messageId
+    // hash when available so the same event doesn't produce two system
+    // notifications with different ids.
+    final int notificationId =
+        (message.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch) &
+        0x7fffffff;
+
     flutterLocalNotificationsPlugin.show(
-      DateTime.now().microsecond,
-      message.notification!.title,
-      message.notification!.body,
+      notificationId,
+      message.notification?.title,
+      message.notification?.body,
       notificationDetails,
       payload: message.data.toString(),
     );

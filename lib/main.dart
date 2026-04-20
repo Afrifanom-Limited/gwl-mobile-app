@@ -38,23 +38,29 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'views/index/intro.dart';
 
+// Top-level background handler (must be top-level or static for the background
+// isolate to be able to resolve it). Do NOT show a local notification here when
+// the payload already contains a `notification` block: Firebase will render the
+// system-tray notification itself, and posting a local one would duplicate it.
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage? message) async {
-  await Firebase.initializeApp();
-  if (message != null) {
-    processBackgroundMessage(message);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (message == null) return;
+  if (message.notification == null) {
+    LocalNotification.initialize();
+    LocalNotification.showNotification(message);
   }
+  LocalNotification.showBadger();
 }
 
 // Entry point of Main Application
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   LocalNotification.initialize();
+
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-  messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
   if (Platform.isIOS) {
-    messaging.requestPermission(
+    await messaging.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -65,25 +71,35 @@ Future<void> main() async {
     );
   }
 
-  // Set the background messaging handler early on, as a named top-level function
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  /// Update the iOS foreground notification
-  ///  presentation options to allow heads up notifications.
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+  // Let iOS/FCM display the heads-up banner itself while the app is in the
+  // foreground. We intentionally skip posting a local notification on iOS in
+  // `onMessage` to avoid showing two notifications for the same push.
+  await messaging.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
     sound: true,
   );
 
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]).then((_) {
+  // Register the background handler exactly once, with a top-level function.
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.manual,
+    overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top],
+  ).then((_) {
     runApp(RestartWidget(child: App()));
   });
 }
 
-Future<void> processBackgroundMessage(RemoteMessage message) async {
+// Foreground handler. On iOS, FCM already renders the banner because of
+// `setForegroundNotificationPresentationOptions`, so we must not post a local
+// notification too. On Android, FCM does NOT auto-display while the app is in
+// the foreground, so we render it ourselves via flutter_local_notifications.
+Future<void> processForegroundMessage(RemoteMessage message) async {
   LocalNotification.showBadger();
-  LocalNotification.showNotification(message);
+  if (Platform.isAndroid) {
+    LocalNotification.showNotification(message);
+  }
 }
 
 class App extends StatefulWidget {
@@ -92,29 +108,29 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  static final GlobalKey<NavigatorState> _navigatorKey = GlobalKey(debugLabel: "Main Navigator");
+  static final GlobalKey<NavigatorState> _navigatorKey = GlobalKey(
+    debugLabel: "Main Navigator",
+  );
 
   _initFirebaseMessaging() async {
-    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
-      if (message != null) {
-        processBackgroundMessage(message);
-      }
-    });
+    // Cold start from a notification tap: the notification has already been
+    // shown by the system, so only route the user to the right screen.
+    final RemoteMessage? initialMessage = await FirebaseMessaging.instance
+        .getInitialMessage();
+    if (initialMessage != null) {
+      _handleNotificationMessageReceived(initialMessage);
+    }
 
-    FirebaseMessaging.onBackgroundMessage((RemoteMessage? message) async {
-      if (message != null) {
-        processBackgroundMessage(message);
-      }
-    });
-
+    // New push received while the app is in the foreground.
     FirebaseMessaging.onMessage.listen((RemoteMessage? message) {
       if (message != null) {
-        processBackgroundMessage(message);
+        processForegroundMessage(message);
       }
     });
 
+    // User tapped a notification that woke the app from background. The
+    // notification is already on screen; just navigate — don't re-post it.
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      processBackgroundMessage(message);
       _handleNotificationMessageReceived(message);
     });
   }
@@ -187,7 +203,9 @@ class _AppState extends State<App> {
             labelLarge: TextStyle(color: Colors.white),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(backgroundColor: Constants.kPrimaryColor),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Constants.kPrimaryColor,
+            ),
           ),
           textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(
@@ -195,9 +213,10 @@ class _AppState extends State<App> {
             ),
           ),
           outlinedButtonTheme: OutlinedButtonThemeData(
-              style: TextButton.styleFrom(
-            foregroundColor: Constants.kAccentColor,
-          )),
+            style: TextButton.styleFrom(
+              foregroundColor: Constants.kAccentColor,
+            ),
+          ),
           inputDecorationTheme: InputDecorationTheme(
             contentPadding: EdgeInsets.all(8),
             filled: true,
@@ -209,7 +228,9 @@ class _AppState extends State<App> {
               borderRadius: BorderRadius.circular(8.0),
             ),
           ),
-          colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Constants.kAccentColor),
+          colorScheme: ColorScheme.fromSwatch().copyWith(
+            secondary: Constants.kAccentColor,
+          ),
         ),
         routes: {
           Introduction.id: (context) => Introduction(),
@@ -242,11 +263,15 @@ class _AppState extends State<App> {
   }
 
   static _openNotifications() {
-    _navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => Notifications()));
+    _navigatorKey.currentState?.push(
+      MaterialPageRoute(builder: (context) => Notifications()),
+    );
   }
 
   static _openComplaints() {
-    _navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => ComplaintsList()));
+    _navigatorKey.currentState?.push(
+      MaterialPageRoute(builder: (context) => ComplaintsList()),
+    );
   }
 
   void _handleNotificationMessageReceived(RemoteMessage message) {
@@ -294,10 +319,7 @@ class _RestartWidgetState extends State<RestartWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: key,
-      child: widget.child,
-    );
+    return KeyedSubtree(key: key, child: widget.child);
   }
 }
 
