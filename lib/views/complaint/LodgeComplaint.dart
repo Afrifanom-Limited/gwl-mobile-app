@@ -102,7 +102,7 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
 
   @override
   void initState() {
-    _requestPermissions();
+   
     _lifecycleListener = AppLifecycleListener(
       onResume: _checkPermissions,
     );
@@ -311,22 +311,28 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
 
   bool _permissionReady = false;
   AppLifecycleListener? _lifecycleListener;
-  static const List<Permission> _permissions = [Permission.storage, Permission.camera];
+
+  Permission get _storagePermission =>
+      Platform.isIOS ? Permission.photos : Permission.storage;
 
   Future<void> _requestPermissions() async {
-    final Map<Permission, PermissionStatus> statues = await _permissions.request();
-    if (statues.values.every((status) => status.isGranted)) {
-      _permissionReady = true;
+    final status = await _storagePermission.request();
+    if (status.isGranted || status.isLimited) {
+      if (mounted) setState(() => _permissionReady = true);
+    } else {
+      if (mounted) setState(() => _permissionReady = false);
     }
   }
 
   Future<void> _checkPermissions() async {
-    _permissionReady = (await Future.wait(_permissions.map((e) => e.isGranted))).every((isGranted) => isGranted);
+    final status = await _storagePermission.status;
+    _permissionReady = status.isGranted || status.isLimited;
   }
 
   Future<void> _loadImageAssets() async {
+    await _requestPermissions();
     if (!_permissionReady) {
-      openAppSettings();
+      await openAppSettings();
       return;
     }
 

@@ -3,11 +3,19 @@
 <plist version="1.0">
 <dict>
 <key>LSApplicationQueriesSchemes</key>
- <array>
-  <string>sms</string>
-  <string>tel</string>
-  <string>telprompt</string>
-  </array>
+	<array>
+		<string>sms</string>
+		<string>tel</string>
+		<string>telprompt</string>
+	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photos so you can attach evidence to a complaint.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need permission to save photos to your library.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your camera so you can attach a photo to a complaint.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need access to your microphone for recording audio with videos.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
