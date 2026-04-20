@@ -20,7 +20,13 @@ import 'package:gwcl/helpers/Functions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Feeds extends StatefulWidget {
-  const Feeds({Key? key}) : super(key: key);
+  final bool newFeedsAvailable;
+  final ValueChanged<bool>? onNewFeedsAvailable;
+  const Feeds({
+    Key? key,
+    required this.newFeedsAvailable,
+    this.onNewFeedsAvailable,
+  }) : super(key: key);
 
   @override
   State<Feeds> createState() => _FeedsState();
@@ -33,6 +39,24 @@ class _FeedsState extends State<Feeds> {
   var currentUrl = Endpoints.feeds;
   var currentSearchValue = "";
   int _page = 1;
+
+  bool _hasNewFeeds({
+    required List<dynamic> previousFeeds,
+    required List<dynamic> latestFeeds,
+  }) {
+    if (previousFeeds.isEmpty || latestFeeds.isEmpty) return false;
+
+    final previousIds = previousFeeds
+        .map((feed) => feed["feed_id"]?.toString())
+        .whereType<String>()
+        .toSet();
+    final latestIds = latestFeeds
+        .map((feed) => feed["feed_id"]?.toString())
+        .whereType<String>()
+        .toSet();
+
+    return latestIds.difference(previousIds).isNotEmpty;
+  }
 
   _loadFeeds() async {
     SharedPreferences _localStorage = await SharedPreferences.getInstance();
@@ -47,6 +71,7 @@ class _FeedsState extends State<Feeds> {
   _fetchFeeds() async {
     setState(() => hasData(_feeds) ? _refreshing = true : _loading = true);
     SharedPreferences _localStorage = await SharedPreferences.getInstance();
+    final previousFeeds = List<dynamic>.from(_feeds);
     RestDataSource _request = new RestDataSource();
     setState(() {
       currentUrl = Endpoints.feeds;
@@ -56,6 +81,11 @@ class _FeedsState extends State<Feeds> {
       _request.get(context, url: currentUrl).then((Map response) {
         if (response[Constants.success]) {
           var records = response[Constants.response]["records"];
+          final hasNew = _hasNewFeeds(
+            previousFeeds: previousFeeds,
+            latestFeeds: List<dynamic>.from(records),
+          );
+          widget.onNewFeedsAvailable?.call(hasNew);
           var _totalPage = response[Constants.response]["total_page"];
           if (_totalPage > _page) {
             if (mounted) {

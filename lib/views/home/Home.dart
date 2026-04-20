@@ -151,8 +151,13 @@ class _HomeState extends State<Home> {
 
   _subscribeCustomerToNotificationService(String phoneNumber) async {
     FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-    firebaseMessaging.subscribeToTopic(phoneNumber);
-    firebaseMessaging.subscribeToTopic(Constants.appId);
+    // On iOS, FCM topic subscription requires APNs token to be available first.
+    if (Platform.isIOS) {
+      final apnsToken = await firebaseMessaging.getAPNSToken();
+      if (apnsToken == null || apnsToken.isEmpty) return;
+    }
+    await firebaseMessaging.subscribeToTopic(phoneNumber);
+    await firebaseMessaging.subscribeToTopic(Constants.appId);
   }
 
   void _handleMenuButtonPressed() {
