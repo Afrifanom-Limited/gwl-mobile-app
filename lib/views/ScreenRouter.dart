@@ -16,7 +16,8 @@ class ScreenRouter extends StatefulWidget {
   _ScreenRouterState createState() => _ScreenRouterState();
 }
 
-class _ScreenRouterState extends State<ScreenRouter> with AuthStateListener {
+class _ScreenRouterState extends State<ScreenRouter>
+    implements AuthStateListener {
   _ScreenRouterState() {
     var authStateProvider = new AuthStateProvider();
     authStateProvider.subscribe(this);
@@ -77,17 +78,23 @@ class _ScreenRouterState extends State<ScreenRouter> with AuthStateListener {
     RestDataSource _request = new RestDataSource();
     var location = await _getLocation();
     Map deviceInfo = await getDeviceInfo();
-    _request.post(
-      context,
-      url: Endpoints.app_downloads_add,
-      data: {
-        "device_id": deviceInfo.values.toList()[0],
-        "platform": deviceInfo.values.toList()[1],
-        "device_brand": deviceInfo.values.toList()[3],
-        "device_model": deviceInfo.values.toList()[4],
-        "longitude": location != null ? "${location.values.toList()[0]}" : "",
-        "latitude": location != null ? "${location.values.toList()[1]}" : "",
-      },
-    ).then((Map response) async {});
+    _request
+        .post(
+          context,
+          url: Endpoints.app_downloads_add,
+          data: {
+            "device_id": deviceInfo.values.toList()[0],
+            "platform": deviceInfo.values.toList()[1],
+            "device_brand": deviceInfo.values.toList()[3],
+            "device_model": deviceInfo.values.toList()[4],
+            "longitude": location != null
+                ? "${location.values.toList()[0]}"
+                : "",
+            "latitude": location != null
+                ? "${location.values.toList()[1]}"
+                : "",
+          },
+        )
+        .then((Map response) async {});
   }
 }

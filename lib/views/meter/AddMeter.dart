@@ -62,76 +62,80 @@ class _AddMeterState extends State<AddMeter> {
         "long": _longitude,
       };
 
-      _request.post(
-        context,
-        url: Endpoints.meters_verify_customer,
-        data: {"app_signature": appSignature, "account_number": stripSymbols(_accountNumberController.text)},
-      ).then((Map response) async {
-        if (mounted) setState(() => _loading = false);
-        if (response[Constants.success]) {
-          mixpanel?.track('Add Account Customer Success');
-          _onRequestSuccess(_meterData, response[Constants.response]);
-        } else {
-          mixpanel?.track('Add Account Customer Failed');
-          if (response[Constants.response] == "410") {
-            showDialog(
-              context: context,
-              builder: (_) => new ConfirmDialog(
-                title: "Oops!",
-                content: response[Constants.message],
-                confirmText: "Report",
-                confirmTextColor: Constants.kPrimaryColor,
-                cancelText: "Okay",
-                confirm: () {
-                  Navigator.pushReplacement(
-                    context,
-                    FadeRoute(
-                      page: LodgeComplaint(
-                        message: "Hello, \n${response[Constants.message]}",
-                      ),
-                    ),
-                  );
-                },
-              ),
-            );
-          } else {
-            _onRequestFailed(response[Constants.message]);
-          }
-        }
-      });
+      _request
+          .post(
+            context,
+            url: Endpoints.meters_verify_customer,
+            data: {
+              "app_signature": appSignature,
+              "account_number": stripSymbols(_accountNumberController.text),
+            },
+          )
+          .then((Map response) async {
+            if (mounted) setState(() => _loading = false);
+            if (response[Constants.success]) {
+              mixpanel?.track('Add Account Customer Success');
+              _onRequestSuccess(_meterData, response[Constants.response]);
+            } else {
+              mixpanel?.track('Add Account Customer Failed');
+              if (response[Constants.response] == "410") {
+                showDialog(
+                  context: context,
+                  builder: (_) => new ConfirmDialog(
+                    title: "Oops!",
+                    content: response[Constants.message],
+                    confirmText: "Report",
+                    confirmTextColor: Constants.kPrimaryColor,
+                    cancelText: "Okay",
+                    confirm: () {
+                      Navigator.pushReplacement(
+                        context,
+                        FadeRoute(
+                          page: LodgeComplaint(
+                            message: "Hello, \n${response[Constants.message]}",
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              } else {
+                _onRequestFailed(response[Constants.message]);
+              }
+            }
+          });
     }
   }
 
   void _startTimer() {
     const oneSec = const Duration(seconds: 1);
-    _timer = new Timer.periodic(
-      oneSec,
-      (Timer timer) {
-        if (_start == 0) {
-          setState(() {
-            _loading = false;
-            _loadingState = "";
-            _start = 10;
-            _cancelTimer();
-          });
-          HapticFeedback.vibrate();
-          showDialog(
-            context: context,
-            builder: (_) => ConfirmDialog(
-              title: "Unable to get location",
-              content: "Kindly check and ensure that your device location is turned on",
-              confirmText: "Okay",
-              confirmTextColor: Constants.kPrimaryColor,
-              confirm: AppSettings.openLocationSettings,
-            ),
-          );
-        } else {
-          setState(() {
-            _start--;
-          });
-        }
-      },
-    );
+    _timer = new Timer.periodic(oneSec, (Timer timer) {
+      if (_start == 0) {
+        setState(() {
+          _loading = false;
+          _loadingState = "";
+          _start = 10;
+          _cancelTimer();
+        });
+        HapticFeedback.vibrate();
+        showDialog(
+          context: context,
+          builder: (_) => ConfirmDialog(
+            title: "Unable to get location",
+            content:
+                "Kindly check and ensure that your device location is turned on",
+            confirmText: "Okay",
+            confirmTextColor: Constants.kPrimaryColor,
+            confirm: () =>
+                AppSettings.openAppSettings(type: AppSettingsType.location),
+          ),
+        );
+      } else {
+        setState(() {
+          _start--;
+        });
+      }
+    });
   }
 
   _cancelTimer() {
@@ -168,25 +172,27 @@ class _AddMeterState extends State<AddMeter> {
       _loadingState = "Requesting digital address from GhanaPostGPS...";
     });
     RestDataSource _request = new RestDataSource();
-    _request.post(
-      context,
-      url: Endpoints.gps_get_digital_address,
-      data: {
-        "lat": lat,
-        "long": long,
-      },
-    ).then((Map response) async {
-      if (mounted)
-        setState(() {
-          _loading = false;
-          _loadingState = "";
+    _request
+        .post(
+          context,
+          url: Endpoints.gps_get_digital_address,
+          data: {"lat": lat, "long": long},
+        )
+        .then((Map response) async {
+          if (mounted)
+            setState(() {
+              _loading = false;
+              _loadingState = "";
+            });
+          if (response[Constants.success]) {
+            setState(
+              () => _digitalAddressController.text =
+                  response[Constants.response]["digital_address"],
+            );
+          } else {
+            _onRequestFailed(response[Constants.message]);
+          }
         });
-      if (response[Constants.success]) {
-        setState(() => _digitalAddressController.text = response[Constants.response]["digital_address"]);
-      } else {
-        _onRequestFailed(response[Constants.message]);
-      }
-    });
   }
 
   _checkPermissions() async {
@@ -240,9 +246,7 @@ class _AddMeterState extends State<AddMeter> {
       progressIndicator: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CircularLoader(
-            loaderColor: Constants.kPrimaryColor,
-          ),
+          CircularLoader(loaderColor: Constants.kPrimaryColor),
           if (_loadingState.length > 0)
             Container(
               padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
@@ -253,7 +257,7 @@ class _AddMeterState extends State<AddMeter> {
                 textSize: 10.sp,
                 textColor: Constants.kPrimaryColor,
               ),
-            )
+            ),
         ],
       ),
       child: Scaffold(
@@ -266,181 +270,184 @@ class _AddMeterState extends State<AddMeter> {
                 padding: EdgeInsets.symmetric(
                   horizontal: Constants.indexHorizontalSpace,
                 ),
-                child: Column(children: <Widget>[
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Constants.kSizeHeight_20,
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5.w),
-                          child: GText(
-                            textData: "Customer Account Number *",
-                            textSize: 12.sp,
-                            textColor: Constants.kPrimaryColor,
+                child: Column(
+                  children: <Widget>[
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          Constants.kSizeHeight_20,
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5.w),
+                            child: GText(
+                              textData: "Customer Account Number *",
+                              textSize: 12.sp,
+                              textColor: Constants.kPrimaryColor,
+                            ),
                           ),
-                        ),
-                        Constants.kSizeHeight_5,
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5.w),
-                          child: GText(
-                            textData: "Enter your 12-characters Ghana Water customer"
-                                " account number. An OTP code will "
-                                "be sent to customer's phone number to verify ownership",
-                            textSize: 10.sp,
-                            textColor: Constants.kGreyColor,
-                            textMaxLines: 5,
+                          Constants.kSizeHeight_5,
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5.w),
+                            child: GText(
+                              textData:
+                                  "Enter your 12-characters Ghana Water customer"
+                                  " account number. An OTP code will "
+                                  "be sent to customer's phone number to verify ownership",
+                              textSize: 10.sp,
+                              textColor: Constants.kGreyColor,
+                              textMaxLines: 5,
+                            ),
                           ),
-                        ),
-                        Constants.kSizeHeight_10,
-                        TextFormField(
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          controller: _accountNumberController,
-                          toolbarOptions: ToolbarOptions(
-                            paste: true,
-                            cut: true,
-                            copy: true,
-                            selectAll: true,
-                          ),
-                          textCapitalization: TextCapitalization.characters,
-                          validator: (value) {
-                            if (value!.length < 14) return "Invalid customer number provided";
-                            return null;
-                          },
-                          inputFormatters: [MaskTextInputFormatter(mask: "GGGG-GGGG-GGGG")],
-                          onFieldSubmitted: (v) {
-                            FocusScope.of(context).nextFocus();
-                          },
-                          style: circularTextStyle(),
-                          decoration: circularInputDecoration(
-                            title: "",
-                          ),
-                        ),
-                        Constants.kSizeHeight_20,
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5.w),
-                          child: GText(
-                            textData: "Alias (optional)",
-                            textSize: 12.sp,
-                            textColor: Constants.kPrimaryColor,
-                          ),
-                        ),
-                        Constants.kSizeHeight_5,
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5.w),
-                          child: GText(
-                            textData: "For example: Kwabena Dougan's Home",
-                            textSize: 10.sp,
-                            textColor: Constants.kGreyColor,
-                          ),
-                        ),
-                        Constants.kSizeHeight_10,
-                        TextFormField(
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          controller: _aliasController,
-                          onFieldSubmitted: (v) {
-                            FocusScope.of(context).nextFocus();
-                          },
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(30),
-                          ],
-                          style: circularTextStyle(),
-                          decoration: circularInputDecoration(
-                            title: "",
-                          ),
-                        ),
-                        Constants.kSizeHeight_20,
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 5.w,
-                          ),
-                          child: GText(
-                            textData: "Digital Address (optional)",
-                            textSize: 12.sp,
-                            textColor: Constants.kPrimaryColor,
-                          ),
-                        ),
-                        Constants.kSizeHeight_5,
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              GText(
-                                textData: 'Provide the digital address of your meter location ',
-                                textSize: 10.sp,
-                                textMaxLines: 3,
-                                textColor: Constants.kGreyColor,
-                              ),
-                              SizedBox(height: 2.h),
-                              GText(
-                                textData: "Powered by GhanaPost GPS",
-                                textSize: 10.sp,
-                                textColor: Constants.kWarningColor,
-                              ),
+                          Constants.kSizeHeight_10,
+                          TextFormField(
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            controller: _accountNumberController,
+                            toolbarOptions: ToolbarOptions(
+                              paste: true,
+                              cut: true,
+                              copy: true,
+                              selectAll: true,
+                            ),
+                            textCapitalization: TextCapitalization.characters,
+                            validator: (value) {
+                              if (value!.length < 14)
+                                return "Invalid customer number provided";
+                              return null;
+                            },
+                            inputFormatters: [
+                              MaskTextInputFormatter(mask: "GGGG-GGGG-GGGG"),
                             ],
+                            onFieldSubmitted: (v) {
+                              FocusScope.of(context).nextFocus();
+                            },
+                            style: circularTextStyle(),
+                            decoration: circularInputDecoration(title: ""),
                           ),
-                        ),
-                        Constants.kSizeHeight_10,
-                        TextFormField(
-                          keyboardType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          controller: _digitalAddressController,
-                          onFieldSubmitted: (v) {
-                            FocusScope.of(context).nextFocus();
-                          },
-                          inputFormatters: <TextInputFormatter>[
-                            UpperCaseTextFormatter(),
-                            FilteringTextInputFormatter.allow(
-                              RegExp("[a-zA-Z0-9-]"),
+                          Constants.kSizeHeight_20,
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5.w),
+                            child: GText(
+                              textData: "Alias (optional)",
+                              textSize: 12.sp,
+                              textColor: Constants.kPrimaryColor,
                             ),
-                            LengthLimitingTextInputFormatter(12),
-                          ],
-                          style: circularTextStyle(),
-                          decoration: circularInputDecoration(
-                            title: "",
-                            suffix: Container(
-                              margin: EdgeInsets.only(right: 3.w),
-                              child: buildOutlinedButton(
-                                title: "Get Address",
-                                bgColor: Constants.kPrimaryLightColor,
-                                textColor: Constants.kPrimaryColor,
-                                padding: EdgeInsets.all(1.w),
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => ConfirmDialog(
-                                      title: "Confirm Location",
-                                      content: "Are you currently at the "
-                                          "location of the water meter?",
-                                      confirmText: "Yes",
-                                      cancelText: "No",
-                                      confirmTextColor: Constants.kPrimaryColor,
-                                      confirm: () {
-                                        _getLocation();
-                                      },
-                                    ),
-                                  );
-                                },
+                          ),
+                          Constants.kSizeHeight_5,
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5.w),
+                            child: GText(
+                              textData: "For example: Kwabena Dougan's Home",
+                              textSize: 10.sp,
+                              textColor: Constants.kGreyColor,
+                            ),
+                          ),
+                          Constants.kSizeHeight_10,
+                          TextFormField(
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            controller: _aliasController,
+                            onFieldSubmitted: (v) {
+                              FocusScope.of(context).nextFocus();
+                            },
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(30),
+                            ],
+                            style: circularTextStyle(),
+                            decoration: circularInputDecoration(title: ""),
+                          ),
+                          Constants.kSizeHeight_20,
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5.w),
+                            child: GText(
+                              textData: "Digital Address (optional)",
+                              textSize: 12.sp,
+                              textColor: Constants.kPrimaryColor,
+                            ),
+                          ),
+                          Constants.kSizeHeight_5,
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                GText(
+                                  textData:
+                                      'Provide the digital address of your meter location ',
+                                  textSize: 10.sp,
+                                  textMaxLines: 3,
+                                  textColor: Constants.kGreyColor,
+                                ),
+                                SizedBox(height: 2.h),
+                                GText(
+                                  textData: "Powered by GhanaPost GPS",
+                                  textSize: 10.sp,
+                                  textColor: Constants.kWarningColor,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Constants.kSizeHeight_10,
+                          TextFormField(
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            controller: _digitalAddressController,
+                            onFieldSubmitted: (v) {
+                              FocusScope.of(context).nextFocus();
+                            },
+                            inputFormatters: <TextInputFormatter>[
+                              UpperCaseTextFormatter(),
+                              FilteringTextInputFormatter.allow(
+                                RegExp("[a-zA-Z0-9-]"),
+                              ),
+                              LengthLimitingTextInputFormatter(12),
+                            ],
+                            style: circularTextStyle(),
+                            decoration: circularInputDecoration(
+                              title: "",
+                              suffix: Container(
+                                margin: EdgeInsets.only(right: 3.w),
+                                child: buildOutlinedButton(
+                                  title: "Get Address",
+                                  bgColor: Constants.kPrimaryLightColor,
+                                  textColor: Constants.kPrimaryColor,
+                                  padding: EdgeInsets.all(1.w),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => ConfirmDialog(
+                                        title: "Confirm Location",
+                                        content:
+                                            "Are you currently at the "
+                                            "location of the water meter?",
+                                        confirmText: "Yes",
+                                        cancelText: "No",
+                                        confirmTextColor:
+                                            Constants.kPrimaryColor,
+                                        confirm: () {
+                                          _getLocation();
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Constants.kSizeHeight_20,
-                        buildElevatedButton(
-                          title: "Add Customer Account",
-                          onPressed: () {
-                            _submitForm();
-                          },
-                        ),
-                        Constants.kSizeHeight_5,
-                      ],
+                          Constants.kSizeHeight_20,
+                          buildElevatedButton(
+                            title: "Add Customer Account",
+                            onPressed: () {
+                              _submitForm();
+                            },
+                          ),
+                          Constants.kSizeHeight_5,
+                        ],
+                      ),
                     ),
-                  ),
-                ]),
+                  ],
+                ),
               ),
             ),
           ],
@@ -465,14 +472,19 @@ class _AddMeterState extends State<AddMeter> {
   }
 
   _proceedToHome() {
-    Navigator.of(context).pushNamedAndRemoveUntil(Home.id, (Route<dynamic> route) => false);
+    Navigator.of(
+      context,
+    ).pushNamedAndRemoveUntil(Home.id, (Route<dynamic> route) => false);
   }
 
   _onRequestFailed(dynamic errorText) async {
     showDialog(
       context: context,
       builder: (_) => ErrorDialog(
-        content: errorText.toString().replaceAll(RegExp(Constants.errorFilter), ""),
+        content: errorText.toString().replaceAll(
+          RegExp(Constants.errorFilter),
+          "",
+        ),
       ),
     );
     // showBasicsFlash(
