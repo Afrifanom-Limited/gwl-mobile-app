@@ -60,10 +60,13 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
       //   files.add(file);
       // }
       RestDataSource _request = new RestDataSource();
-      _request.postFile(context, url: Endpoints.complaints_add, files: _images, data: {
-        "complaint_type": _complaintTypeValue,
-        "message": _messageController.text,
-      }).then((Map response) async {
+      _request.postFile(context,
+          url: Endpoints.complaints_add,
+          files: _images,
+          data: {
+            "complaint_type": _complaintTypeValue,
+            "message": _messageController.text,
+          }).then((Map response) async {
         if (mounted) setState(() => _loading = false);
         if (response[Constants.success]) {
           mixpanel?.track('Lodge Complaints');
@@ -81,11 +84,10 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
   }
 
   _initAll() async {
-    var status = await Permission.storage.status;
-    if (status.isLimited) {
-      await Permission.storage.request();
-    }
-
+    // Android 13+ no longer uses `Permission.storage` (it doesn't map to any
+    // runtime permission). For reading gallery images we use Permission.photos,
+    // which maps to READ_MEDIA_IMAGES on Android 13+ and to the Photos library
+    // on iOS.
     if (Platform.isIOS) {
       var mediaLibrary = await Permission.mediaLibrary.status;
       if (mediaLibrary.isLimited) {
@@ -102,7 +104,6 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
 
   @override
   void initState() {
-   
     _lifecycleListener = AppLifecycleListener(
       onResume: _checkPermissions,
     );
@@ -136,7 +137,10 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
           children: [
             Container(
               decoration: BoxDecoration(
-                image: DecorationImage(image: Constants.kBgTwo, fit: BoxFit.cover, colorFilter: ColorFilter.linearToSrgbGamma()),
+                image: DecorationImage(
+                    image: Constants.kBgTwo,
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.linearToSrgbGamma()),
               ),
             ),
             SingleChildScrollView(
@@ -156,7 +160,8 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 10.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 5.w, vertical: 10.h),
                             child: GText(
                               textData: "Complaint Type *",
                               textSize: 12.sp,
@@ -165,7 +170,12 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
                           ),
                           DropDownFormField(
                             value: _complaintTypeValue,
-                            inputDecoration: circularInputDecoration(title: "", circularRadius: 10.w, useDropDownPadding: true, suffix: Icon(Icons.keyboard_arrow_down_outlined, size: 22.sp)),
+                            inputDecoration: circularInputDecoration(
+                                title: "",
+                                circularRadius: 10.w,
+                                useDropDownPadding: true,
+                                suffix: Icon(Icons.keyboard_arrow_down_outlined,
+                                    size: 22.sp)),
                             onSaved: (value) {
                               setState(() {
                                 _complaintTypeValue = value;
@@ -189,7 +199,8 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
                           ),
                           Constants.kSizeHeight_10,
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 10.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 5.w, vertical: 10.h),
                             child: GText(
                               textData: "Message *",
                               textSize: 12.sp,
@@ -215,9 +226,11 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
                           ),
                           Constants.kSizeHeight_10,
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 10.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 5.w, vertical: 10.h),
                             child: GText(
-                              textData: "Attach photo evidence to complaint (optional) ",
+                              textData:
+                                  "Attach photo evidence to complaint (optional) ",
                               textSize: 12.sp,
                               textColor: Constants.kPrimaryColor,
                             ),
@@ -247,14 +260,16 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
                               child: _images.length < 1
                                   ? Center(
                                       child: GText(
-                                        textData: "Selected images will be displayed here",
+                                        textData:
+                                            "Selected images will be displayed here",
                                         textSize: 10.sp,
                                       ),
                                     )
                                   : ListView(
                                       padding: EdgeInsets.all(10.w),
                                       scrollDirection: Axis.horizontal,
-                                      children: List.generate(_images.length, (index) {
+                                      children: List.generate(_images.length,
+                                          (index) {
                                         return Column(
                                           children: <Widget>[
                                             SizedBox(
@@ -270,7 +285,9 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
                                             ),
                                             OutlinedButton(
                                               onPressed: () {
-                                                List<File> mPhotos = Utils.arrayRemove(_images, index);
+                                                List<File> mPhotos =
+                                                    Utils.arrayRemove(
+                                                        _images, index);
                                                 setState(() {
                                                   _images = mPhotos;
                                                 });
@@ -312,11 +329,21 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
   bool _permissionReady = false;
   AppLifecycleListener? _lifecycleListener;
 
-  Permission get _storagePermission =>
-      Platform.isIOS ? Permission.photos : Permission.storage;
+  // On Android 13+, image_picker uses the system Photo Picker which needs no
+  // runtime permission; on older Android we also don't need one for the Photo
+  // Picker compatibility path. `Permission.storage` here would silently fail
+  // on API 33+ and block the picker. So we only gate on iOS, where
+  // Permission.photos is required to read the photo library.
+  Permission? get _storagePermission =>
+      Platform.isIOS ? Permission.photos : null;
 
   Future<void> _requestPermissions() async {
-    final status = await _storagePermission.request();
+    final permission = _storagePermission;
+    if (permission == null) {
+      if (mounted) setState(() => _permissionReady = true);
+      return;
+    }
+    final status = await permission.request();
     if (status.isGranted || status.isLimited) {
       if (mounted) setState(() => _permissionReady = true);
     } else {
@@ -325,7 +352,12 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
   }
 
   Future<void> _checkPermissions() async {
-    final status = await _storagePermission.status;
+    final permission = _storagePermission;
+    if (permission == null) {
+      _permissionReady = true;
+      return;
+    }
+    final status = await permission.status;
     _permissionReady = status.isGranted || status.isLimited;
   }
 
@@ -349,7 +381,8 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
 
       if (result.isNotEmpty) {
         if (result.length > 5) {
-          _images = result.sublist(0, 5).map((file) => File(file.path)).toList();
+          _images =
+              result.sublist(0, 5).map((file) => File(file.path)).toList();
         } else {
           _images = result.map((file) => File(file.path)).toList();
         }
@@ -371,7 +404,8 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
       CoolAlertType.success,
       barrierDismissible: false,
       title: "Success",
-      subtitle: "Complaint submitted successfully. Your ticket number is ${complaint.ticketId}",
+      subtitle:
+          "Complaint submitted successfully. Your ticket number is ${complaint.ticketId}",
       confirmBtnText: "View All Complaints",
       showCancelBtn: false,
       onConfirmBtnTap: () {
@@ -389,7 +423,8 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
     showDialog(
       context: context,
       builder: (_) => ErrorDialog(
-        content: errorText.toString().replaceAll(RegExp(Constants.errorFilter), ""),
+        content:
+            errorText.toString().replaceAll(RegExp(Constants.errorFilter), ""),
       ),
     );
     // showBasicsFlash(

@@ -27,8 +27,6 @@ import 'package:gwcl/views/meter/EditSecondaryPhoneNumber.dart';
 import 'package:gwcl/views/transactions/PayBill.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:open_file/open_file.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 import '../../mixpanel.dart';
 
 class MeterDetails extends StatefulWidget {
@@ -524,12 +522,10 @@ class _MeterDetailsState extends State<MeterDetails> {
   }
 
   _requestWritePermission() async {
-    var storageStatus = await Permission.storage.status;
-    if (storageStatus.isGranted) {
-      setState(() {
-        _allowWriteFile = true;
-      });
-    }
+    if (!mounted) return;
+    setState(() {
+      _allowWriteFile = true;
+    });
   }
 
   Future<String> _getDirectoryPath() async {

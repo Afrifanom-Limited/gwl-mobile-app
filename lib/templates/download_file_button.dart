@@ -8,8 +8,6 @@ import 'package:gwcl/helpers/Endpoints.dart';
 import 'package:gwcl/helpers/Functions.dart';
 import 'package:gwcl/helpers/ProgressDialog.dart';
 import 'package:open_file/open_file.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 import '../mixpanel.dart';
 import '../system/RestDataSource.dart';
 
@@ -29,13 +27,16 @@ class _DownloadFileButtonState extends State<DownloadFileButton> {
   String _progress = "";
   bool _allowWriteFile = false;
 
+  // Writes go to app-scoped storage (getExternalStorageDirectory on Android,
+  // getApplicationDocumentsDirectory on iOS), which requires no runtime
+  // permission. `Permission.storage` is a no-op on Android 13+ (it no longer
+  // maps to any runtime permission) and would silently leave _allowWriteFile
+  // false, blocking downloads.
   _requestWritePermission() async {
-    var storageStatus = await Permission.storage.status;
-    if (storageStatus.isGranted) {
-      setState(() {
-        _allowWriteFile = true;
-      });
-    }
+    if (!mounted) return;
+    setState(() {
+      _allowWriteFile = true;
+    });
   }
 
   Future<String> _getDirectoryPath() async {

@@ -22,8 +22,6 @@ import 'package:gwcl/views/report/Report.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:open_file/open_file.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 import '../../mixpanel.dart';
 
 class RequestedReports extends StatefulWidget {
@@ -56,7 +54,8 @@ class _RequestedReportsState extends State<RequestedReports> {
   }
 
   _fetchReportRequests() async {
-    setState(() => hasData(_reportRequests) ? _refreshing = true : _loading = true);
+    setState(
+        () => hasData(_reportRequests) ? _refreshing = true : _loading = true);
     RestDataSource _request = new RestDataSource();
     _request.get(context, url: Endpoints.report_requests).then((Map response) {
       if (response[Constants.success]) {
@@ -121,7 +120,10 @@ class _RequestedReportsState extends State<RequestedReports> {
           children: [
             Container(
               decoration: BoxDecoration(
-                image: DecorationImage(image: Constants.kBgTwo, fit: BoxFit.cover, colorFilter: ColorFilter.linearToSrgbGamma()),
+                image: DecorationImage(
+                    image: Constants.kBgTwo,
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.linearToSrgbGamma()),
               ),
             ),
             _refreshing
@@ -236,7 +238,8 @@ class _RequestedReportsState extends State<RequestedReports> {
     showDialog(
       context: context,
       builder: (_) => ErrorDialog(
-        content: errorText.toString().replaceAll(RegExp(Constants.errorFilter), ""),
+        content:
+            errorText.toString().replaceAll(RegExp(Constants.errorFilter), ""),
       ),
     );
     // showBasicsFlash(
@@ -261,18 +264,19 @@ class ReportRequestItem extends StatefulWidget {
 }
 
 class _ReportRequestItemState extends State<ReportRequestItem> {
-  bool _allowWriteFile = false, _isDownloaded = false, _deletingRecord = false, _isDeleted = false;
+  bool _allowWriteFile = false,
+      _isDownloaded = false,
+      _deletingRecord = false,
+      _isDeleted = false;
 
   late Dio _dio;
   String progress = "";
 
   _requestWritePermission() async {
-    var storageStatus = await Permission.storage.status;
-    if (storageStatus.isGranted) {
-      setState(() {
-        _allowWriteFile = true;
-      });
-    }
+    if (!mounted) return;
+    setState(() {
+      _allowWriteFile = true;
+    });
   }
 
   Future<String> _getDirectoryPath() async {
@@ -332,7 +336,8 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
       _requestWritePermission();
     }
     try {
-      ProgressDialog progressDialog = ProgressDialog(context, type: ProgressDialogType.Normal);
+      ProgressDialog progressDialog =
+          ProgressDialog(context, type: ProgressDialogType.Normal);
       progressDialog.style(
         message: "Downloading File",
         messageTextStyle: TextStyle(
@@ -366,7 +371,8 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
   @override
   void initState() {
     super.initState();
-    if (_checkIfDocumentIsReport()) _checkIfFileExists(widget.reportReq['report_file_link']);
+    if (_checkIfDocumentIsReport())
+      _checkIfFileExists(widget.reportReq['report_file_link']);
   }
 
   final _format = DateFormat("dd MMMM, yyyy");
@@ -381,7 +387,8 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
   }
 
   bool _checkIfDocumentIsReport() {
-    if (widget.reportReq['report_file_link'] == null || widget.reportReq['report_file_link'] == "null") {
+    if (widget.reportReq['report_file_link'] == null ||
+        widget.reportReq['report_file_link'] == "null") {
       return false;
     }
     return true;
@@ -393,7 +400,11 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
       _isDeleted = false;
     });
     RestDataSource _request = new RestDataSource();
-    _request.get(context, url: Endpoints.report_requests_delete.replaceFirst("{id}", "${widget.reportReq['report_request_id']}")).then((Map response) async {
+    _request
+        .get(context,
+            url: Endpoints.report_requests_delete.replaceFirst(
+                "{id}", "${widget.reportReq['report_request_id']}"))
+        .then((Map response) async {
       if (mounted)
         setState(() {
           _deletingRecord = false;
@@ -401,13 +412,16 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
         });
       if (response[Constants.success]) {
         var _localDb = new LocalDatabase();
-        await _localDb.deleteReportRequest(widget.reportReq['report_request_id'].toString());
+        await _localDb.deleteReportRequest(
+            widget.reportReq['report_request_id'].toString());
         _deleteFile(widget.reportReq['report_file_link']);
       } else {
         if (mounted)
           showBasicsFlash(
             context,
-            response[Constants.message].toString().replaceAll(RegExp(Constants.errorFilter), ""),
+            response[Constants.message]
+                .toString()
+                .replaceAll(RegExp(Constants.errorFilter), ""),
             textColor: Constants.kWhiteColor,
             bgColor: Constants.kWarningLightColor,
           );
@@ -416,8 +430,10 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
   }
 
   bool _isSameMonth() {
-    dynamic _startMonth = _formatDate(DateTime.parse(widget.reportReq['start_date']), _monthFormat);
-    dynamic _endMonth = _formatDate(DateTime.parse(widget.reportReq['end_date']), _monthFormat);
+    dynamic _startMonth = _formatDate(
+        DateTime.parse(widget.reportReq['start_date']), _monthFormat);
+    dynamic _endMonth =
+        _formatDate(DateTime.parse(widget.reportReq['end_date']), _monthFormat);
     if (_startMonth == _endMonth) {
       return true;
     }
@@ -453,7 +469,9 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
                         : 'Statement is ready. Tap on the "Download/View" button.'
                             ' Long press for more options',
                     duration: Duration(seconds: 3),
-                    textColor: !_checkIfDocumentIsReport() ? Constants.kRedLightColor : Constants.kAccentColor,
+                    textColor: !_checkIfDocumentIsReport()
+                        ? Constants.kRedLightColor
+                        : Constants.kAccentColor,
                     bgColor: Constants.kWhiteColor,
                   );
                 },
@@ -466,7 +484,8 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           GText(
-                            textData: "${getStatementTitle(widget.reportReq['report_type'].toString().toUpperCase())}",
+                            textData:
+                                "${getStatementTitle(widget.reportReq['report_type'].toString().toUpperCase())}",
                             textColor: Constants.kPrimaryColor,
                             textFont: Constants.kFontMedium,
                             textSize: 12.sp,
@@ -482,7 +501,8 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
                       ),
                       Constants.kSizeHeight_5,
                       GText(
-                        textData: "Requested on ${_formatDate(DateTime.parse(widget.reportReq['date_created']), _fullDateFormat)}",
+                        textData:
+                            "Requested on ${_formatDate(DateTime.parse(widget.reportReq['date_created']), _fullDateFormat)}",
                         textSize: 9.sp,
                         textColor: Constants.kGreyColor,
                       ),
@@ -505,8 +525,10 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
                               0: FractionColumnWidth(.25),
                             },
                             children: [
-                              tableRow("From", "${_formatDate(DateTime.parse(widget.reportReq['start_date']), _format)}"),
-                              tableRow("To", "${_formatDate(DateTime.parse(widget.reportReq['end_date']), _format)}"),
+                              tableRow("From",
+                                  "${_formatDate(DateTime.parse(widget.reportReq['start_date']), _format)}"),
+                              tableRow("To",
+                                  "${_formatDate(DateTime.parse(widget.reportReq['end_date']), _format)}"),
                             ],
                           ),
                         ],
@@ -521,7 +543,8 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
                           0: FractionColumnWidth(.25),
                         },
                         children: [
-                          tableRow("For", "${_formatDate(DateTime.parse(widget.reportReq['end_date']), _billMonthFormat)}"),
+                          tableRow("For",
+                              "${_formatDate(DateTime.parse(widget.reportReq['end_date']), _billMonthFormat)}"),
                         ],
                       ),
                     if (!_checkIfDocumentIsReport())
@@ -545,14 +568,21 @@ class _ReportRequestItemState extends State<ReportRequestItem> {
                           )
                         : _checkIfDocumentIsReport()
                             ? buildOutlinedButton(
-                                bgColor: _isDownloaded ? Constants.kPrimaryColor : Constants.kWhiteColor,
-                                textColor: _isDownloaded ? Constants.kWhiteColor : Constants.kWarningColor,
-                                title: _isDownloaded ? "View Bill" : "Download Statement",
+                                bgColor: _isDownloaded
+                                    ? Constants.kPrimaryColor
+                                    : Constants.kWhiteColor,
+                                textColor: _isDownloaded
+                                    ? Constants.kWhiteColor
+                                    : Constants.kWarningColor,
+                                title: _isDownloaded
+                                    ? "View Bill"
+                                    : "Download Statement",
                                 borderRadius: 10.w,
                                 titleFont: Constants.kFontMedium,
                                 textSize: 11.sp,
                                 onPressed: () {
-                                  _openFile(widget.reportReq['report_file_link']);
+                                  _openFile(
+                                      widget.reportReq['report_file_link']);
                                 },
                               )
                             : Icon(
