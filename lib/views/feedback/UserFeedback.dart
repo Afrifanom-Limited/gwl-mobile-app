@@ -55,7 +55,7 @@ class _UserFeedbackState extends State<UserFeedback> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -150,7 +150,7 @@ class _UserFeedbackState extends State<UserFeedback> {
                             left: 0.w, right: 0.w, top: 10.h, bottom: 0.h),
                         child: Container(
                           decoration: BoxDecoration(
-                              color: Constants.kPrimaryColor.withOpacity(0.2),
+                              color: Constants.kPrimaryColor.withValues(alpha: 0.2),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(5.w))),
                           child: Padding(

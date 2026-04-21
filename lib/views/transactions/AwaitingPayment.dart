@@ -260,7 +260,7 @@ class _AwaitingPaymentState extends State<AwaitingPayment> {
         context,
         _checkPaymentStatus(payment) ? CoolAlertType.success : CoolAlertType.error,
         title: _checkPaymentStatus(payment) ? "Success" : "Failed",
-        subtitle: _checkPaymentStatus(payment) ? "Payment was successful. Your Transaction ID is ${payment.transactionId}" : "Payment was unsuccessful",
+        subtitle: _checkPaymentStatus(payment) ? "Payment was successful. Your Transaction ID is ${payment?.transactionId ?? 'N/A'}" : "Payment was unsuccessful",
         confirmBtnText: "Done",
         showCancelBtn: false,
         barrierDismissible: false,

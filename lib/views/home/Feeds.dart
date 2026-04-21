@@ -8,6 +8,7 @@ import 'package:gwcl/helpers/Constants.dart';
 import 'package:gwcl/helpers/Endpoints.dart';
 import 'package:gwcl/helpers/Loaders.dart';
 import 'package:gwcl/helpers/LocalNotifications.dart';
+import 'package:gwcl/helpers/ReactionButton.dart';
 import 'package:gwcl/helpers/ReadMore.dart';
 import 'package:gwcl/helpers/Text.dart';
 import 'package:gwcl/models/Feed.dart';
@@ -186,7 +187,7 @@ class _FeedsState extends State<Feeds> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -335,7 +336,7 @@ class FeedItem extends StatefulWidget {
 
 class _FeedItemState extends State<FeedItem> {
   int _currentMediaIndex = 0;
-  // bool _isLiked = false;
+  bool _isLiked = false;
   final _fullDateFormat = DateFormat("dd MMMM, yyyy hh:mm aaa");
   String _formatDate(DateTime date, DateFormat format) {
     try {
@@ -359,7 +360,7 @@ class _FeedItemState extends State<FeedItem> {
   @override
   void initState() {
     super.initState();
-    // _isLiked = widget.feed.isLiked(widget.feed.isLikedByMe);
+    _isLiked = widget.feed.isLiked(widget.feed.isLikedByMe);
   }
 
   @override
@@ -488,35 +489,35 @@ class _FeedItemState extends State<FeedItem> {
               padding: EdgeInsets.symmetric(horizontal: 10.w),
               child: Row(
                 children: [
-                  // Padding(
-                  //   padding:
-                  //       const EdgeInsets.only(top: 8.0, left: 8.0, bottom: 8.0),
-                  //   child: widget.feed.isLiked(widget.feed.isLikedByMe)
-                  //       ? Row(
-                  //           children: [
-                  //             Icon(Icons.thumb_up,
-                  //                 size: 20.sp, color: Constants.kGreenLightColor),
-                  //             Constants.kSizeWidth_5,
-                  //             GText(
-                  //                 textData:
-                  //                     "You and ${NumberFormat.compact().format(widget.feed.reactions)} others liked this")
-                  //           ],
-                  //         )
-                  //       : Builder(builder: (BuildContext context) {
-                  //           return ThumbsUpIconAnimator(
-                  //             isLiked: _isLiked,
-                  //             size: 24.sp,
-                  //             onTap: () {
-                  //               HapticFeedback.lightImpact();
-                  //               setState(() => _isLiked = !_isLiked);
-                  //               if (_isLiked) {
-                  //                 _submitImpression('like');
-                  //               }
-                  //             },
-                  //           );
-                  //         }),
-                  // ),
-                  // Spacer(),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 8.0, left: 8.0, bottom: 8.0),
+                    child: widget.feed.isLiked(widget.feed.isLikedByMe)
+                        ? Row(
+                            children: [
+                              Icon(Icons.thumb_up,
+                                  size: 20.sp, color: Constants.kGreenLightColor),
+                              Constants.kSizeWidth_5,
+                              GText(
+                                  textData:
+                                      "You and ${NumberFormat.compact().format(widget.feed.reactions)} others liked this")
+                            ],
+                          )
+                        : Builder(builder: (BuildContext context) {
+                            return ThumbsUpIconAnimator(
+                              isLiked: _isLiked,
+                              size: 24.sp,
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                setState(() => _isLiked = !_isLiked);
+                                if (_isLiked) {
+                                  _submitImpression('like');
+                                }
+                              },
+                            );
+                          }),
+                  ),
+                  Spacer(),
                   if (media.length > 1)
                     PhotoCarouselIndicator(
                       photoCount: media.length,

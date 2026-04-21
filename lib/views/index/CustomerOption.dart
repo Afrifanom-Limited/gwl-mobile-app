@@ -20,7 +20,7 @@ class _CustomerOptionState extends State<CustomerOption> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -51,9 +51,9 @@ class _CustomerOptionState extends State<CustomerOption> {
                         Constants.kSizeHeight_10,
                         ClipOval(
                           child: Material(
-                            color: Constants.kPrimaryColor.withOpacity(0.2), // button color
+                            color: Constants.kPrimaryColor.withValues(alpha: 0.2), // button color
                             child: InkWell(
-                              splashColor: Constants.kPrimaryColor.withOpacity(0.5),
+                              splashColor: Constants.kPrimaryColor.withValues(alpha: 0.5),
                               child: SizedBox(width: 40.w, height: 40.h, child: Icon(Icons.close)),
                               onTap: () => Navigator.pop(context),
                             ),
@@ -65,7 +65,7 @@ class _CustomerOptionState extends State<CustomerOption> {
                     Constants.kSizeHeight_20,
                     Card(
                       elevation: 2,
-                      color: Constants.kWhiteColor.withOpacity(0.7),
+                      color: Constants.kWhiteColor.withValues(alpha: 0.7),
                       child: InkWell(
                         onTap: () {
                           Navigator.pushNamed(context, RegisterCustomer.id);
@@ -105,7 +105,7 @@ class _CustomerOptionState extends State<CustomerOption> {
                     Constants.kSizeHeight_10,
                     Card(
                       elevation: 2,
-                      color: Constants.kWhiteColor.withOpacity(0.7),
+                      color: Constants.kWhiteColor.withValues(alpha: 0.7),
                       child: InkWell(
                         onTap: () {
                           Navigator.pushNamed(context, RegisterNonCustomer.id);

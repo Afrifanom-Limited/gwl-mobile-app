@@ -231,7 +231,7 @@ class _CardPaymentFormState extends State<CardPaymentForm> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: Column(
         mainAxisSize: MainAxisSize.min,
@@ -468,7 +468,7 @@ class _CardPaymentFormState extends State<CardPaymentForm> {
                       if (widget.savedCard == null) Constants.kSizeHeight_20,
                       if (widget.savedCard == null)
                         Container(
-                          color: Constants.kNearlyDarkBlueColor.withOpacity(0.2),
+                          color: Constants.kNearlyDarkBlueColor.withValues(alpha: 0.2),
                           padding: EdgeInsets.symmetric(
                               horizontal: 2.w, vertical: 2.h),
                           child: SwitchListTile(

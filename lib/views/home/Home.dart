@@ -170,13 +170,13 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
       ),
       child: AdvancedDrawer(
-        backdropColor: Constants.kPrimaryColor.withOpacity(0.7),
+        backdropColor: Constants.kPrimaryColor.withValues(alpha: 0.7),
         controller: _advancedDrawerController,
         openRatio: 0.70,
         animationCurve: Curves.easeInOut,

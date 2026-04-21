@@ -52,7 +52,7 @@ class _SavedCardsState extends State<SavedCards> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,

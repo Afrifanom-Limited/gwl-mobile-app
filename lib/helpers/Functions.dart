@@ -269,8 +269,19 @@ dynamic coolAlert(
       fontSize: 14.sp,
     ),
     barrierDismissible: barrierDismissible ?? true,
-    onCancelBtnTap: onCancelBtnTap ?? () {},
-    onConfirmBtnTap: onConfirmBtnTap ?? () {},
+    closeOnConfirmBtnTap: false,
+    onCancelBtnTap: () {
+      if (Navigator.of(context, rootNavigator: true).canPop()) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+      onCancelBtnTap?.call();
+    },
+    onConfirmBtnTap: () {
+      if (Navigator.of(context, rootNavigator: true).canPop()) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+      onConfirmBtnTap?.call();
+    },
   );
 }
 
@@ -608,7 +619,7 @@ viewImages(BuildContext context, List<dynamic> images, int index) {
                         child: Material(
                           color: Constants.kRedColor, // button color
                           child: InkWell(
-                            splashColor: Constants.kPrimaryColor.withOpacity(0.5),
+                            splashColor: Constants.kPrimaryColor.withValues(alpha: 0.5),
                             child: SizedBox(width: 50.w, height: 50.w, child: Icon(Icons.close, color: Constants.kWhiteColor)),
                             onTap: () {
                               Navigator.pop(context);
@@ -662,10 +673,10 @@ addAccountFirst(BuildContext context) {
                 bottomLeft: Radius.circular(10.w),
                 bottomRight: Radius.circular(10.w),
               ),
-              border: Border.all(color: Constants.kPrimaryColor.withOpacity(0.2)),
+              border: Border.all(color: Constants.kPrimaryColor.withValues(alpha: 0.2)),
               boxShadow: [
                 BoxShadow(
-                  color: Constants.kPrimaryColor.withOpacity(0.2),
+                  color: Constants.kPrimaryColor.withValues(alpha: 0.2),
                   spreadRadius: 0,
                   blurRadius: 3,
                   offset: Offset(0, 1),

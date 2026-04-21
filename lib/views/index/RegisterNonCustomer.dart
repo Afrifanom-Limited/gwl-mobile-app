@@ -41,7 +41,7 @@ class _RegisterNonCustomerState extends State<RegisterNonCustomer> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -72,9 +72,9 @@ class _RegisterNonCustomerState extends State<RegisterNonCustomer> {
                         Constants.kSizeHeight_10,
                         ClipOval(
                           child: Material(
-                            color: Constants.kPrimaryColor.withOpacity(0.2), // button color
+                            color: Constants.kPrimaryColor.withValues(alpha: 0.2), // button color
                             child: InkWell(
-                              splashColor: Constants.kPrimaryColor.withOpacity(0.5),
+                              splashColor: Constants.kPrimaryColor.withValues(alpha: 0.5),
                               child: SizedBox(width: 40.w, height: 40.h, child: Icon(Icons.close)),
                               onTap: () {
                                 FocusScope.of(context).requestFocus(FocusNode());

@@ -19,10 +19,10 @@ InputDecoration circularInputDecoration({
     hintText: title,
     prefixIcon: prefix ?? null,
     filled: true,
-    fillColor: fillColor ?? Constants.kPrimaryLightColor.withOpacity(0.5),
+    fillColor: fillColor ?? Constants.kPrimaryLightColor.withValues(alpha: 0.5),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(circularRadius ?? 17.w)),
-      borderSide: BorderSide(color: Constants.kGreyColor.withOpacity(0.02)),
+      borderSide: BorderSide(color: Constants.kGreyColor.withValues(alpha: 0.02)),
     ),
     counterStyle: TextStyle(color: counterColor ?? Constants.kGreyColor),
     errorMaxLines: 5,

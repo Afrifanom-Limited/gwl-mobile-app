@@ -166,7 +166,7 @@ class _ReportState extends State<Report> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -526,7 +526,7 @@ class _ReportState extends State<Report> {
                             child: Container(
                               decoration: BoxDecoration(
                                   color:
-                                      Constants.kPrimaryColor.withOpacity(0.2),
+                                      Constants.kPrimaryColor.withValues(alpha: 0.2),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(5.w))),
                               child: Padding(

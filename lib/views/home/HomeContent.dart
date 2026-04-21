@@ -433,10 +433,10 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
                                   decoration: BoxDecoration(
                                     color: Constants.kPrimaryLightColor,
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: Constants.kPrimaryColor.withOpacity(0.2)),
+                                    border: Border.all(color: Constants.kPrimaryColor.withValues(alpha: 0.2)),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Constants.kPrimaryColor.withOpacity(0.2),
+                                        color: Constants.kPrimaryColor.withValues(alpha: 0.2),
                                         spreadRadius: 0,
                                         blurRadius: 3,
                                         offset: Offset(0, 1),
@@ -497,10 +497,10 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
                         decoration: BoxDecoration(
                           color: Constants.kPrimaryLightColor,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Constants.kPrimaryColor.withOpacity(0.2)),
+                          border: Border.all(color: Constants.kPrimaryColor.withValues(alpha: 0.2)),
                           boxShadow: [
                             BoxShadow(
-                              color: Constants.kPrimaryColor.withOpacity(0.2),
+                              color: Constants.kPrimaryColor.withValues(alpha: 0.2),
                               spreadRadius: 0,
                               blurRadius: 0.0,
                               offset: Offset(0, 1),
@@ -664,7 +664,7 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
                         borderRadius: BorderRadius.circular(10.0),
                         boxShadow: [
                           BoxShadow(
-                            color: Constants.kGreyColor.withOpacity(0.1),
+                            color: Constants.kGreyColor.withValues(alpha: 0.1),
                             spreadRadius: 3,
                             blurRadius: 2.0,
                             offset: Offset(1, 2),
@@ -754,42 +754,42 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
                   payment: _payments[i],
                 ),
               Constants.kSizeHeight_20,
-              if (_payments.length > 0)
-                if (_meters.length > 0)
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        padding: EdgeInsets.all(20),
-                        elevation: 1,
-                        shape: StadiumBorder(),
-                        backgroundColor: Constants.kPrimaryColor,
-                      ),
-                      icon: Icon(
-                        Icons.list_alt_rounded,
-                        size: 40,
-                      ),
-                      label: GText(
-                        textData: "Request Customer Statement",
-                        textSize: 13.sp,
-                        textColor: Constants.kWhiteColor,
-                        textFont: Constants.kFontMedium,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Report(
-                              customer: widget.customer,
-                              reportType: 'statement',
-                              billingReportType: 'multiple',
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-              Constants.kSizeHeight_20,
+              // if (_payments.length > 0)
+              //   if (_meters.length > 0)
+              //     Container(
+              //       width: MediaQuery.of(context).size.width * 0.9,
+              //       child: FilledButton.icon(
+              //         style: FilledButton.styleFrom(
+              //           padding: EdgeInsets.all(20),
+              //           elevation: 1,
+              //           shape: StadiumBorder(),
+              //           backgroundColor: Constants.kPrimaryColor,
+              //         ),
+              //         icon: Icon(
+              //           Icons.list_alt_rounded,
+              //           size: 40,
+              //         ),
+              //         label: GText(
+              //           textData: "Request Customer Statement",
+              //           textSize: 13.sp,
+              //           textColor: Constants.kWhiteColor,
+              //           textFont: Constants.kFontMedium,
+              //         ),
+              //         onPressed: () {
+              //           Navigator.push(
+              //             context,
+              //             MaterialPageRoute(
+              //               builder: (context) => Report(
+              //                 customer: widget.customer,
+              //                 reportType: 'statement',
+              //                 billingReportType: 'multiple',
+              //               ),
+              //             ),
+              //           );
+              //         },
+              //       ),
+              //     ),
+              // Constants.kSizeHeight_20,
             ],
           ),
         ),

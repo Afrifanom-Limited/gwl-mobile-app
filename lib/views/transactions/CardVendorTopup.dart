@@ -225,7 +225,7 @@ class _CardVendorTopupState extends State<CardVendorTopup> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: Column(
         mainAxisSize: MainAxisSize.min,
@@ -438,7 +438,7 @@ class _CardVendorTopupState extends State<CardVendorTopup> {
                       if (widget.savedCard == null) Constants.kSizeHeight_20,
                       if (widget.savedCard == null)
                         Container(
-                          color: Constants.kPrimaryColor.withOpacity(0.1),
+                          color: Constants.kPrimaryColor.withValues(alpha: 0.1),
                           padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 10.h),
                           child: SwitchListTile(
                             activeColor: Constants.kPrimaryColor,

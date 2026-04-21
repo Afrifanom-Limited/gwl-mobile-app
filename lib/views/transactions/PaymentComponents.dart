@@ -117,7 +117,7 @@ class Transaction extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
           boxShadow: [
             BoxShadow(
-              color: Constants.kGreyColor.withOpacity(0.1),
+              color: Constants.kGreyColor.withValues(alpha: 0.1),
               spreadRadius: 2,
               blurRadius: 2.0,
               offset: Offset(2, 3),

@@ -400,7 +400,7 @@ class _PayBillSummaryState extends State<PayBillSummary> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -437,7 +437,7 @@ class _PayBillSummaryState extends State<PayBillSummary> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
-                        color: Constants.kPrimaryColor.withOpacity(0.9),
+                        color: Constants.kPrimaryColor.withValues(alpha: 0.9),
                         elevation: 0.0,
                         child: ListTile(
                           contentPadding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 20.w),
@@ -502,7 +502,7 @@ class _PayBillSummaryState extends State<PayBillSummary> {
                       if (autoPaymentEligible(widget.paymentDetails['network'].toString()))
                         if (!_autoPayLoading)
                           Container(
-                            color: _toggleRecurringBilling ? Constants.kGreenLightColor.withOpacity(0.3) : Constants.kPrimaryColor.withOpacity(0.1),
+                            color: _toggleRecurringBilling ? Constants.kGreenLightColor.withValues(alpha: 0.3) : Constants.kPrimaryColor.withValues(alpha: 0.1),
                             padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 10.h),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,

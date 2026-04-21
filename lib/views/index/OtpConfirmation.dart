@@ -78,7 +78,7 @@ class _OtpConfirmationState extends State<OtpConfirmation> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -165,7 +165,7 @@ class _OtpConfirmationState extends State<OtpConfirmation> {
                                       color: Constants.kAccentColor,
                                     ),
                                     strokeColorBuilder: FixedColorBuilder(
-                                      Constants.kAccentColor.withOpacity(0.3),
+                                      Constants.kAccentColor.withValues(alpha: 0.3),
                                     ),
                                   ),
                                   controller: _codeController,

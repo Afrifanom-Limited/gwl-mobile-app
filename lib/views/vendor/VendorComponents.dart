@@ -92,10 +92,10 @@ class _VendorCardState extends State<VendorCard> {
         borderRadius: BorderRadius.all(
           Radius.circular(10.w),
         ),
-        border: Border.all(color: Constants.kPrimaryColor.withOpacity(0.2)),
+        border: Border.all(color: Constants.kPrimaryColor.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: Constants.kPrimaryColor.withOpacity(0.2),
+            color: Constants.kPrimaryColor.withValues(alpha: 0.2),
             spreadRadius: 0,
             blurRadius: 0.0,
             offset: Offset(0, 1),
@@ -118,7 +118,7 @@ class _VendorCardState extends State<VendorCard> {
         title: GText(
           textData: "${_vendor["account_number"]}",
           textSize: 12.sp,
-          textColor: widget.textColor.withOpacity(0.9),
+          textColor: widget.textColor.withValues(alpha: 0.9),
           textFont: Constants.kFontMedium,
         ),
         subtitle: Column(
@@ -128,14 +128,14 @@ class _VendorCardState extends State<VendorCard> {
             GText(
               textData: "${_vendor["account_name"]}",
               textSize: 14.sp,
-              textColor: widget.textColor.withOpacity(0.9),
+              textColor: widget.textColor.withValues(alpha: 0.9),
             ),
             Constants.kSizeHeight_5,
             Row(
               children: [
                 GText(
                   textData: "Your balance is",
-                  textColor: widget.textColor.withOpacity(0.9),
+                  textColor: widget.textColor.withValues(alpha: 0.9),
                   textSize: 12.sp,
                 ),
                 Constants.kSizeWidth_5,

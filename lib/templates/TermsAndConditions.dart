@@ -21,9 +21,9 @@ class TermsAndConditions extends StatelessWidget {
           Constants.kSizeHeight_10,
           ClipOval(
             child: Material(
-              color: Constants.kPrimaryColor.withOpacity(0.2), // button color
+              color: Constants.kPrimaryColor.withValues(alpha: 0.2), // button color
               child: InkWell(
-                splashColor: Constants.kPrimaryColor.withOpacity(0.5),
+                splashColor: Constants.kPrimaryColor.withValues(alpha: 0.5),
                 child:
                     SizedBox(width: 35, height: 35, child: Icon(Icons.close)),
                 onTap: () => Navigator.pop(context),
@@ -34,7 +34,7 @@ class TermsAndConditions extends StatelessWidget {
       ),
       content: ModalProgressHUD(
         inAsyncCall: _loading,
-        color: Constants.kWhiteColor.withOpacity(0.8),
+        color: Constants.kWhiteColor.withValues(alpha: 0.8),
         opacity: 0.5,
         progressIndicator: CircularLoader(
           loaderColor: Constants.kPrimaryColor,

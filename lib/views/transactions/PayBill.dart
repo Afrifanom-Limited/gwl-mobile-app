@@ -305,7 +305,7 @@ class _PayBillState extends State<PayBill> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -472,7 +472,7 @@ class _PayBillState extends State<PayBill> {
                                     decoration: circularInputDecoration(
                                       title: "",
                                       circularRadius: 10.w,
-                                      fillColor: Constants.kGreenLightColor.withOpacity(0.2),
+                                      fillColor: Constants.kGreenLightColor.withValues(alpha: 0.2),
                                     ),
                                   ),
                                   Container(

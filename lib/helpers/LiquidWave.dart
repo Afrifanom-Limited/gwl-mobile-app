@@ -96,7 +96,7 @@ class _LiquidWaveState extends State<LiquidWave> with TickerProviderStateMixin {
                   color: Constants.kPrimaryColor,
                   gradient: LinearGradient(
                     colors: [
-                      Constants.kPrimaryColor.withOpacity(0.4),
+                      Constants.kPrimaryColor.withValues(alpha: 0.4),
                       Constants.kPrimaryColor
                     ],
                     begin: Alignment.topLeft,
@@ -142,7 +142,7 @@ class _LiquidWaveState extends State<LiquidWave> with TickerProviderStateMixin {
                   width: 2,
                   height: 2,
                   decoration: BoxDecoration(
-                    color: Constants.kWhiteColor.withOpacity(0.4),
+                    color: Constants.kWhiteColor.withValues(alpha: 0.4),
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -161,7 +161,7 @@ class _LiquidWaveState extends State<LiquidWave> with TickerProviderStateMixin {
                   width: 4,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Constants.kWhiteColor.withOpacity(0.4),
+                    color: Constants.kWhiteColor.withValues(alpha: 0.4),
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -180,7 +180,7 @@ class _LiquidWaveState extends State<LiquidWave> with TickerProviderStateMixin {
                   width: 3,
                   height: 3,
                   decoration: BoxDecoration(
-                    color: Constants.kWhiteColor.withOpacity(0.4),
+                    color: Constants.kWhiteColor.withValues(alpha: 0.4),
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -197,7 +197,7 @@ class _LiquidWaveState extends State<LiquidWave> with TickerProviderStateMixin {
                   width: 4,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Constants.kWhiteColor.withOpacity(
+                    color: Constants.kWhiteColor.withValues(alpha: 
                         animationController.status == AnimationStatus.reverse
                             ? 0.0
                             : 0.4),

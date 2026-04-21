@@ -91,7 +91,7 @@ class _ForceVerifyPhoneNumberState extends State<ForceVerifyPhoneNumber> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -170,7 +170,7 @@ class _ForceVerifyPhoneNumberState extends State<ForceVerifyPhoneNumber> {
                                   color: Constants.kAccentColor,
                                 ),
                                 strokeColorBuilder: FixedColorBuilder(
-                                  Constants.kAccentColor.withOpacity(0.3),
+                                  Constants.kAccentColor.withValues(alpha: 0.3),
                                 ),
                               ),
                               controller: _codeController,

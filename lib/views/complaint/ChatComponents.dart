@@ -55,7 +55,7 @@ class _ChatBubbleState extends State<ChatBubble> {
   @override
   Widget build(BuildContext context) {
     final bg = _isCustomer()
-        ? Constants.kPrimaryColor.withOpacity(0.9)
+        ? Constants.kPrimaryColor.withValues(alpha: 0.9)
         : Colors.grey[600];
     final align =
         _isCustomer() ? CrossAxisAlignment.end : CrossAxisAlignment.start;
@@ -202,7 +202,7 @@ class ComplaintBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = Constants.kPrimaryColor.withOpacity(0.9);
+    final bg = Constants.kPrimaryColor.withValues(alpha: 0.9);
     final align = CrossAxisAlignment.end;
     final radius = BorderRadius.only(
       topLeft: Radius.circular(20.0),

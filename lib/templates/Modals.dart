@@ -63,9 +63,9 @@ class _ScreenModalState extends State<ScreenModal> {
                   ),
                   ClipOval(
                     child: Material(
-                      color: Constants.kPrimaryColor.withOpacity(0.2), // button color
+                      color: Constants.kPrimaryColor.withValues(alpha: 0.2), // button color
                       child: InkWell(
-                        splashColor: Constants.kPrimaryColor.withOpacity(0.5),
+                        splashColor: Constants.kPrimaryColor.withValues(alpha: 0.5),
                         child: SizedBox(width: 50, height: 50, child: Icon(Icons.close)),
                         onTap: () {
                           Navigator.pop(context);
@@ -135,7 +135,7 @@ class _CardModalState extends State<CardModal> {
     return Container(
       height: _height * 0.5,
       decoration: BoxDecoration(
-        color: Constants.kWhiteColor.withOpacity(0.01),
+        color: Constants.kWhiteColor.withValues(alpha: 0.01),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),

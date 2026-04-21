@@ -118,7 +118,7 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -254,7 +254,7 @@ class _LodgeComplaintState extends State<LodgeComplaint> {
                               height: 150.h,
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: Constants.kGreyColor.withOpacity(0.2),
+                                color: Constants.kGreyColor.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               child: _images.length < 1

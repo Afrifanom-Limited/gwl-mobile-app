@@ -194,10 +194,10 @@ class _MeterCardState extends State<MeterCard> {
               borderRadius: BorderRadius.all(
                 Radius.circular(10.w),
               ),
-              border: Border.all(color: Constants.kPrimaryColor.withOpacity(0.2)),
+              border: Border.all(color: Constants.kPrimaryColor.withValues(alpha: 0.2)),
               boxShadow: [
                 BoxShadow(
-                  color: Constants.kPrimaryColor.withOpacity(0.2),
+                  color: Constants.kPrimaryColor.withValues(alpha: 0.2),
                   spreadRadius: 0,
                   blurRadius: 0.0,
                   offset: Offset(0, 1),
@@ -220,7 +220,7 @@ class _MeterCardState extends State<MeterCard> {
               title: GText(
                 textData: "${_meter["meter_alias"] ?? _meter["service_category_name"]}",
                 textSize: 14.sp,
-                textColor: widget.textColor.withOpacity(0.9),
+                textColor: widget.textColor.withValues(alpha: 0.9),
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -229,7 +229,7 @@ class _MeterCardState extends State<MeterCard> {
                   GText(
                     textData: "${_meter["account_number"]}",
                     textSize: 14.sp,
-                    textColor: widget.textColor.withOpacity(0.9),
+                    textColor: widget.textColor.withValues(alpha: 0.9),
                     textFont: Constants.kFontMedium,
                   ),
                   Constants.kSizeHeight_5,
@@ -237,7 +237,7 @@ class _MeterCardState extends State<MeterCard> {
                     children: [
                       GText(
                         textData: _isOwing ? "You owe this amount" : "Your balance is",
-                        textColor: widget.textColor.withOpacity(0.9),
+                        textColor: widget.textColor.withValues(alpha: 0.9),
                         textSize: 10.sp,
                       ),
                       Constants.kSizeWidth_10,
@@ -328,14 +328,14 @@ class _MeterCardState extends State<MeterCard> {
                           padding: EdgeInsets.symmetric(vertical: 11.w, horizontal: 12.h),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(colors: [
-                              Constants.kPrimaryColor.withOpacity(0.5),
+                              Constants.kPrimaryColor.withValues(alpha: 0.5),
                               Constants.kPrimaryColor,
                             ]),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Constants.kPrimaryColor.withOpacity(0.2)),
+                            border: Border.all(color: Constants.kPrimaryColor.withValues(alpha: 0.2)),
                             boxShadow: [
                               BoxShadow(
-                                color: Constants.kPrimaryColor.withOpacity(0.2),
+                                color: Constants.kPrimaryColor.withValues(alpha: 0.2),
                                 spreadRadius: 0,
                                 blurRadius: 0.0,
                                 offset: Offset(0, 1),
@@ -400,7 +400,7 @@ class _MeterCardState extends State<MeterCard> {
                                           GText(
                                             textData: "${formatCustomerAccountNumber(_meter["account_number"])}",
                                             textSize: 14.sp,
-                                            textColor: widget.textColor.withOpacity(0.9),
+                                            textColor: widget.textColor.withValues(alpha: 0.9),
                                             textFont: Constants.kFontMedium,
                                           ),
                                         ],
@@ -420,7 +420,7 @@ class _MeterCardState extends State<MeterCard> {
                                           ),
                                           GText(
                                             textData: _isOwing ? "You owe this amount" : "Your balance is",
-                                            textColor: widget.textColor.withOpacity(0.9),
+                                            textColor: widget.textColor.withValues(alpha: 0.9),
                                             textSize: 10.sp,
                                           ),
                                         ],

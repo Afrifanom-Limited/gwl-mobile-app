@@ -61,7 +61,7 @@ class _HelpState extends State<Help> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -134,7 +134,7 @@ class _HelpState extends State<Help> {
                               "all complaints directly on a prompt and fair basis. ",
                           textMaxLines: 5,
                           textSize: 12.sp,
-                          textColor: Constants.kPrimaryColor.withOpacity(0.6),
+                          textColor: Constants.kPrimaryColor.withValues(alpha: 0.6),
                         ),
                         Constants.kSizeHeight_5,
                         buildOutlinedButton(
@@ -185,7 +185,7 @@ class _HelpState extends State<Help> {
                                     "or statement of payment",
                                 textMaxLines: 5,
                                 textSize: 12.sp,
-                                textColor: Constants.kPrimaryColor.withOpacity(0.6),
+                                textColor: Constants.kPrimaryColor.withValues(alpha: 0.6),
                               ),
                               Constants.kSizeHeight_5,
                               buildOutlinedButton(

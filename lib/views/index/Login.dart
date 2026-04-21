@@ -134,7 +134,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return ModalProgressHUD(
       inAsyncCall: _loading,
-      color: Constants.kWhiteColor.withOpacity(0.8),
+      color: Constants.kWhiteColor.withValues(alpha: 0.8),
       opacity: 0.5,
       progressIndicator: CircularLoader(
         loaderColor: Constants.kPrimaryColor,
@@ -251,7 +251,7 @@ class _LoginState extends State<Login> {
                           style: circularTextStyle(),
                           decoration: circularInputDecoration(
                             title: "Phone Number",
-                            fillColor: widget.isLoggedIn ? Constants.kGreenLightColor.withOpacity(0.2) : null,
+                            fillColor: widget.isLoggedIn ? Constants.kGreenLightColor.withValues(alpha: 0.2) : null,
                           ),
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.digitsOnly,
