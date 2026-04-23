@@ -152,28 +152,32 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
   _fetchPaymentHistory() async {
     SharedPreferences _localStorage = await SharedPreferences.getInstance();
     var _canUpdateMeter = _localStorage.getBool(Constants.canUpdateMeter);
-    if (_canUpdateMeter == null) {
-      if (mounted) {
-        Timer(new Duration(seconds: 1), () {
-          if (mounted) setState(() => _loadingPaymentHistory = true);
-          RestDataSource _request = new RestDataSource();
-          if(!context.mounted) return;
-          _request.get(context, url: Endpoints.payment_history).then((Map response) async {
-            if (mounted) setState(() => _loadingPaymentHistory = false);
-            if (response[Constants.success]) {
-              var records = response[Constants.response]["records"];
-              for (var i = 0; i < records.length; i++) {
-                _payment = Payment.map(records[i]);
-                await _localDb.addPaymentHistory(_payment);
-              }
-              if (mounted) setState(() => this._payments = records);
-            } else {
-              _onRequestFailed(Constants.unableToRefresh);
-            }
-          });
-        });
-      }
-    }
+    if (_canUpdateMeter != null) return;
+    if (!mounted) return;
+
+    Timer(new Duration(seconds: 1), () {
+      if (!mounted) return;
+      setState(() => _loadingPaymentHistory = true);
+
+      final ctx = context;
+      RestDataSource _request = new RestDataSource();
+      _request.get(ctx, url: Endpoints.payment_history).then((Map response) async {
+        if (!mounted) return;
+        setState(() => _loadingPaymentHistory = false);
+        if (response[Constants.success]) {
+          var records = response[Constants.response]["records"];
+          for (var i = 0; i < records.length; i++) {
+            _payment = Payment.map(records[i]);
+            await _localDb.addPaymentHistory(_payment);
+          }
+          if (!mounted) return;
+          setState(() => this._payments = records);
+        } else {
+          if (!mounted) return;
+          _onRequestFailed(Constants.unableToRefresh);
+        }
+      });
+    });
   }
 
   _toggleQuickAccess(selectedValue) async {

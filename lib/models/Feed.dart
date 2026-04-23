@@ -9,7 +9,9 @@ class Feed {
       targetDistrict,
       dateCreated,
       isLikedByMe,
-      reactions;
+      reactions,
+          billData,
+      paymentData;
 
   Feed({
     this.feedId,
@@ -23,6 +25,8 @@ class Feed {
     this.dateCreated,
     this.isLikedByMe,
     this.reactions,
+    this.billData,
+    this.paymentData,
   });
 
   Feed.map(dynamic obj) {
@@ -37,6 +41,8 @@ class Feed {
     this.dateCreated = obj["date_created"];
     this.isLikedByMe = obj["is_liked_by_me"];
     this.reactions = obj["reactions"];
+    this.billData = obj["billData"];
+    this.paymentData = obj["paymentData"];
   }
 
   Map<String, dynamic> toMap() {
@@ -52,6 +58,8 @@ class Feed {
     map["date_created"] = dateCreated;
     map["is_liked_by_me"] = isLikedByMe;
     map["reactions"] = reactions;
+    map["billData"] = billData;
+    map["paymentData"] = paymentData;
     return map;
   }
 

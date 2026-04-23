@@ -13,6 +13,7 @@ import 'package:gwcl/system/RestDataSource.dart';
 import 'package:gwcl/templates/AppHeaders.dart';
 import 'package:gwcl/templates/Dialogs.dart';
 import 'package:gwcl/templates/Modals.dart';
+import 'package:gwcl/views/notifications/BillingTabs.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gwcl/helpers/Functions.dart';
@@ -113,85 +114,92 @@ class _NotificationsState extends State<Notifications> {
             ),
           ),
         ),
-        body: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(image: Constants.kBgTwo, fit: BoxFit.cover, colorFilter: ColorFilter.linearToSrgbGamma()),
-              ),
-            ),
-            _refreshing
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        child: SizedBox(
-                          height: 3.h,
-                          child: BarLoader(
-                            barColor: Constants.kPrimaryColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Container(),
-            _loadingMore
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        child: SizedBox(
-                          height: 1.h,
-                          child: BarLoader(
-                            barColor: Constants.kPrimaryColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Container(),
-            SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 10.w,
-                  vertical: Constants.indexVerticalSpace,
-                ),
-                child: Column(
-                  children: [
-                    !hasData(_notifications)
-                        ? Center(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-                              child: GText(
-                                textData: _loading ? " " : "No notifications to display",
-                                textAlign: TextAlign.center,
-                                textSize: 13.sp,
-                                textColor: Constants.kGreyColor,
-                                textMaxLines: 5,
-                              ),
-                            ),
-                          )
-                        : ColumnBuilder(
-                            itemCount: _notifications.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              Map notification = _notifications[index];
-                              return NotificationItem(
-                                key: UniqueKey(),
-                                notification: notification,
-                              );
-                            },
-                          ),
-                    Constants.kSizeHeight_50
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+        body: BillingTabs(),
+
       ),
     );
   }
+        
+        
+  //       Stack(
+  //         children: [
+  //           Container(
+  //             decoration: BoxDecoration(
+  //               image: DecorationImage(image: Constants.kBgTwo, fit: BoxFit.cover, colorFilter: ColorFilter.linearToSrgbGamma()),
+  //             ),
+  //           ),
+  //           _refreshing
+  //               ? Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.stretch,
+  //                   children: [
+  //                     Container(
+  //                       child: SizedBox(
+  //                         height: 3.h,
+  //                         child: BarLoader(
+  //                           barColor: Constants.kPrimaryColor,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 )
+  //               : Container(),
+  //           _loadingMore
+  //               ? Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.stretch,
+  //                   children: [
+  //                     Container(
+  //                       child: SizedBox(
+  //                         height: 1.h,
+  //                         child: BarLoader(
+  //                           barColor: Constants.kPrimaryColor,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 )
+  //               : Container(),
+  //           SingleChildScrollView(
+  //             physics: BouncingScrollPhysics(),
+  //             child: Padding(
+  //               padding: EdgeInsets.symmetric(
+  //                 horizontal: 10.w,
+  //                 vertical: Constants.indexVerticalSpace,
+  //               ),
+  //               child: Column(
+  //                 children: [
+  //                   !hasData(_notifications)
+  //                       ? Center(
+  //                           child: Padding(
+  //                             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+  //                             child: GText(
+  //                               textData: _loading ? " " : "No notifications to display",
+  //                               textAlign: TextAlign.center,
+  //                               textSize: 13.sp,
+  //                               textColor: Constants.kGreyColor,
+  //                               textMaxLines: 5,
+  //                             ),
+  //                           ),
+  //                         )
+  //                       : ColumnBuilder(
+  //                           itemCount: _notifications.length,
+  //                           itemBuilder: (BuildContext context, int index) {
+  //                             Map notification = _notifications[index];
+  //                             return NotificationItem(
+  //                               key: UniqueKey(),
+  //                               notification: notification,
+  //                             );
+  //                           },
+  //                         ),
+  //                   Constants.kSizeHeight_50
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   _onRequestSuccess(List<dynamic> notifications) async {
     var _localDb = new LocalDatabase();

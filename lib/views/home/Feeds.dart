@@ -336,12 +336,11 @@ class FeedItem extends StatefulWidget {
 
 class _FeedItemState extends State<FeedItem> {
   int _currentMediaIndex = 0;
-  bool _isLiked = false;
   final _fullDateFormat = DateFormat("dd MMMM, yyyy hh:mm aaa");
+
   String _formatDate(DateTime date, DateFormat format) {
     try {
       return _fullDateFormat.format(date);
-      // return DateFormat.jm().format(date);
     } catch (e) {}
     return '';
   }
@@ -357,78 +356,156 @@ class _FeedItemState extends State<FeedItem> {
       });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _isLiked = widget.feed.isLiked(widget.feed.isLikedByMe);
-  }
+  // Helper method to get feed type icon and color
+  Widget _getFeedTypeIndicator() {
+    IconData icon;
+    Color color;
 
-  @override
-  void dispose() {
-    super.dispose();
+    switch (widget.feed.feedType?.toLowerCase()) {
+      case 'tip':
+        icon = Icons.lightbulb_outline;
+        color = Colors.amber;
+        break;
+      case 'news':
+        icon = Icons.article_outlined;
+        color = Colors.blue;
+        break;
+      case 'alert':
+        icon = Icons.warning_amber_outlined;
+        color = Colors.red;
+        break;
+      case 'promo':
+        icon = Icons.local_offer_outlined;
+        color = Colors.green;
+        break;
+      default:
+        icon = Icons.info_outline;
+        color = Constants.kPrimaryColor;
+    }
+
+    return Container(
+      padding: EdgeInsets.all(6.w),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Icon(
+        icon,
+        color: color,
+        size: 16.sp,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     var media = widget.feed.media;
-    if (media.toString().toLowerCase() == 'null' || media.toString().toLowerCase() == '') {
+    if (media.toString().toLowerCase() == 'null' ||
+        media.toString().toLowerCase() == '') {
       media = [];
     } else {
       media = widget.feed.media.split(',');
     }
+
     return Card(
+      elevation: 4,
+      margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 2.w),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.r),
+      ),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 10.h),
+        padding: EdgeInsets.all(16.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
-              child: Row(
-                children: [
-                  Column(
+            // Header with author info and feed type indicator
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Constants.kPrimaryColor.withValues(alpha: 0.2),
+                  radius: 20.sp,
+                  child: Text(
+                    widget.feed.author.isNotEmpty
+                        ? widget.feed.author[0].toUpperCase()
+                        : "G",
+                    style: TextStyle(
+                      color: Constants.kPrimaryColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       GText(
                         textData: "${widget.feed.author}",
-                        textFont: Constants.kFontLight,
-                        textSize: 12.sp,
+                        textFont: Constants.kFontMedium,
+                        textSize: 14.sp,
                       ),
-                      SizedBox(height: 3.h),
+                      SizedBox(height: 2.h),
                       GText(
-                        textData: "${_formatDate(DateTime.parse(widget.feed.dateCreated), _fullDateFormat)}",
+                        textData:
+                            "${_formatDate(DateTime.parse(widget.feed.dateCreated), _fullDateFormat)}",
                         textFont: Constants.kFontLight,
-                        textSize: 9.sp,
+                        textSize: 10.sp,
+                        textColor: Constants.kGreyColor,
                       ),
                     ],
                   ),
-                ],
+                ),
+                _getFeedTypeIndicator(),
+              ],
+            ),
+
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              child: Divider(
+                height: 1,
+                thickness: 1,
+                color: Constants.kGreyColor.withValues(alpha: 0.2),
               ),
             ),
-            Constants.kSizeHeight_10,
+
+            // Title and message
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              padding: EdgeInsets.symmetric(vertical: 5.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   GText(
                     textData: "${widget.feed.title}",
-                    textSize: 13.sp,
+                    textSize: 14.sp,
                     textMaxLines: 5,
-                    textDecoration: TextDecoration.underline,
+                    textFont: Constants.kFontMedium,
+                    textColor: Colors.black,
                   ),
-                  Constants.kSizeHeight_5,
+                  SizedBox(height: 12.h),
                   ReadMoreText(
                     "${widget.feed.message}",
-                    trimLines: 2,
+                    trimLines: 3,
                     colorClickableText: Constants.kPrimaryColor,
                     trimMode: TrimMode.Line,
-                    trimCollapsedText: 'Show more',
-                    trimExpandedText: ' ',
-                    style: TextStyle(fontSize: 13.sp),
-                    moreStyle: TextStyle(fontSize: 13.sp, fontFamily: Constants.kFontMedium, color: Constants.kPrimaryColor),
-                    lessStyle: TextStyle(fontSize: 13.sp, fontFamily: Constants.kFontMedium, color: Constants.kRedColor),
+                    trimCollapsedText: '\nShow more',
+                    trimExpandedText: '\nShow less',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      height: 1.5,
+                      color: Colors.black.withValues(alpha: 0.8),
+                    ),
+                    moreStyle: TextStyle(
+                      fontSize: 14.sp,
+                      fontFamily: Constants.kFontMedium,
+                      color: Constants.kPrimaryColor,
+                    ),
+                    lessStyle: TextStyle(
+                      fontSize: 14.sp,
+                      fontFamily: Constants.kFontMedium,
+                      color: Constants.kPrimaryColor,
+                    ),
                     callback: (bool) {
                       HapticFeedback.lightImpact();
                       if (!bool) {
@@ -440,99 +517,124 @@ class _FeedItemState extends State<FeedItem> {
                       launchURL(link);
                     },
                   ),
-                  Constants.kSizeHeight_10,
                 ],
               ),
             ),
+
+            // Media content - Enhanced for better visual appeal
             if (media.length > 0)
-              CarouselSlider.builder(
-                itemCount: media.length,
-                itemBuilder: (BuildContext context, int index, int pageViewIndex) {
-                  return IntrinsicHeight(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height * 0.5,
-                      ),
-                      child: GestureDetector(
-                        onTap: () => viewImages(context, media, index),
-                        child: CachedNetworkImage(
-                            placeholder: (context, url) => Center(
-                                  child: Container(
-                                    height: 180.h,
-                                    width: MediaQuery.of(context).size.width,
-                                    color: Constants.kPrimaryLightColor,
-                                    child: SizedBox(),
-                                  ),
+              Column(
+                children: [
+                  SizedBox(height: 16.h),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          spreadRadius: 1,
+                          blurRadius: 8,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.r),
+                      child: CarouselSlider.builder(
+                        itemCount: media.length,
+                        itemBuilder: (BuildContext context, int index,
+                            int pageViewIndex) {
+                          return IntrinsicHeight(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight:
+                                    MediaQuery.of(context).size.height * 0.4,
+                              ),
+                              child: GestureDetector(
+                                onTap: () => viewImages(context, media, index),
+                                child: Stack(
+                                  children: [
+                                    CachedNetworkImage(
+                                      placeholder: (context, url) => Center(
+                                        child: Container(
+                                          height: 200.h,
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          color: Constants.kPrimaryLightColor,
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              color: Constants.kPrimaryColor,
+                                              strokeWidth: 2,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      imageUrl: getImagePath(media[index]),
+                                      alignment: Alignment.center,
+                                      fit: BoxFit.cover,
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 200.h,
+                                    ),
+                                    // Gradient overlay at the bottom for better visibility of indicators
+                                    Positioned(
+                                      bottom: 0,
+                                      left: 0,
+                                      right: 0,
+                                      height: 40.h,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Colors.transparent,
+                                              Colors.black.withValues(alpha: 0.3),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                            imageUrl: getImagePath(media[index]),
-                            alignment: Alignment.center,
-                            fit: BoxFit.fitWidth,
-                            width: MediaQuery.of(context).size.width),
+                              ),
+                            ),
+                          );
+                        },
+                        options: CarouselOptions(
+                          viewportFraction: 1.0,
+                          initialPage: 0,
+                          reverse: false,
+                          enableInfiniteScroll: media.length > 1,
+                          enlargeCenterPage: true,
+                          onPageChanged: (index, reason) {
+                            setState(() => _currentMediaIndex = index);
+                          },
+                          scrollDirection: Axis.horizontal,
+                          autoPlay: media.length > 1,
+                          autoPlayInterval: Duration(seconds: 5),
+                          autoPlayAnimationDuration:
+                              Duration(milliseconds: 800),
+                          autoPlayCurve: Curves.fastOutSlowIn,
+                        ),
                       ),
                     ),
-                  );
-                },
-                options: CarouselOptions(
-                  viewportFraction: 1.0,
-                  initialPage: 0,
-                  reverse: false,
-                  enableInfiniteScroll: false,
-                  enlargeCenterPage: true,
-                  onPageChanged: (index, reason) {
-                    setState(() => _currentMediaIndex = index);
-                  },
-                  scrollDirection: Axis.horizontal,
-                ),
-              ),
-            Constants.kSizeHeight_5,
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
-              child: Row(
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(top: 8.0, left: 8.0, bottom: 8.0),
-                    child: widget.feed.isLiked(widget.feed.isLikedByMe)
-                        ? Row(
-                            children: [
-                              Icon(Icons.thumb_up,
-                                  size: 20.sp, color: Constants.kGreenLightColor),
-                              Constants.kSizeWidth_5,
-                              GText(
-                                  textData:
-                                      "You and ${NumberFormat.compact().format(widget.feed.reactions)} others liked this")
-                            ],
-                          )
-                        : Builder(builder: (BuildContext context) {
-                            return ThumbsUpIconAnimator(
-                              isLiked: _isLiked,
-                              size: 24.sp,
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                setState(() => _isLiked = !_isLiked);
-                                if (_isLiked) {
-                                  _submitImpression('like');
-                                }
-                              },
-                            );
-                          }),
                   ),
-                  Spacer(),
                   if (media.length > 1)
-                    PhotoCarouselIndicator(
-                      photoCount: media.length,
-                      activePhotoIndex: _currentMediaIndex,
+                    Padding(
+                      padding: EdgeInsets.only(top: 12.h),
+                      child: PhotoCarouselIndicator(
+                        photoCount: media.length,
+                        activePhotoIndex: _currentMediaIndex,
+                      ),
                     ),
                 ],
               ),
-            ),
           ],
         ),
       ),
     );
   }
 }
-
 class PhotoCarouselIndicator extends StatelessWidget {
   final int photoCount;
   final int activePhotoIndex;

@@ -99,6 +99,9 @@ class Endpoints {
   static const String feeds = api + 'feeds';
   static const String feeds_seen = api + 'feeds/seen';
   static const String feeds_check_numbers = api + 'feeds/check_numbers';
+   // v3 Feedbacks
+  static const String feeds_v3_bills = api + 'feeds/v3?type=bills';
+  static const String feeds_v3_payments = api + 'feeds/v3?type=payments';
   // Auto Payments
   static const String auto_payments = api + 'auto_payments';
   static const String auto_payments_view = api + 'auto_payments/view/{id}';

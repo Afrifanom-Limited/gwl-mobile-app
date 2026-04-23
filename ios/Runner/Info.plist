@@ -16,6 +16,12 @@
 	<string>We need access to your camera so you can attach a photo to a complaint.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need access to your microphone for recording audio with videos.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We use your location to get your GhanaPostGPS digital address when adding a meter.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We use your location to get your GhanaPostGPS digital address when adding a meter.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We use your location to get your GhanaPostGPS digital address when adding a meter.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

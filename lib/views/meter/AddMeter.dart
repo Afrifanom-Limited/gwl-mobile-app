@@ -155,14 +155,32 @@ class _AddMeterState extends State<AddMeter> {
     });
     _startTimer();
     res = await getLongLat();
-    if (mounted)
+    _cancelTimer();
+
+    if (!mounted) return;
+
+    final values = res.values.toList();
+    if (values.length < 2) {
       setState(() {
         _loading = false;
         _loadingState = "";
-        _longitude = "${res.values.toList()[0]}";
-        _latitude = "${res.values.toList()[1]}";
       });
-    _cancelTimer();
+      showDialog(
+        context: context,
+        builder: (_) => ErrorDialog(
+          content:
+              "Unable to get your current location. Please ensure location services are enabled and permission is granted.",
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _loading = false;
+      _loadingState = "";
+      _longitude = "${values[0]}";
+      _latitude = "${values[1]}";
+    });
     _requestDigitalAddress(_latitude, _longitude);
   }
 
