@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:gwcl/helpers/BlinkingWidget.dart';
 
 class CustomBadge extends StatelessWidget {
   final IconData iconData;
   final String? text;
   final VoidCallback? onTap;
   final int alertCount;
+  final bool showLiveUpdate;
 
   const CustomBadge({
     Key? key,
@@ -12,11 +14,11 @@ class CustomBadge extends StatelessWidget {
     this.text,
     required this.iconData,
     required this.alertCount,
+    this.showLiveUpdate = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    double _height = MediaQuery.of(context).size.height;
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -30,20 +32,26 @@ class CustomBadge extends StatelessWidget {
               children: <Widget>[
                 Icon(
                   iconData,
-                  size: alertCount > 0 ? MediaQuery.of(context).size.width * 0.08 : MediaQuery.of(context).size.width * 0.07,
+                  size: MediaQuery.of(context).size.width * 0.07,
                 ),
               ],
             ),
-            if (alertCount > 0)
+            // Live update blinking green dot
+            if (showLiveUpdate)
               Positioned(
-                bottom: _height * 0.046,
-                right: _height * 0.01,
-                child: Icon(
-                  Icons.circle,
-                  color: Colors.red,
-                  size: _height * 0.016,
+                top: MediaQuery.of(context).size.width * 0.10,
+                right: MediaQuery.of(context).size.width * 0.02,
+                child: BlinkingWidget(
+                  widget: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
                 ),
-              )
+              ),
           ],
         ),
       ),

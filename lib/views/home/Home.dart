@@ -45,6 +45,22 @@ class _HomeState extends State<Home> {
   final _advancedDrawerController = AdvancedDrawerController();
   int _index = 0, _notificationCount = 0;
   bool _loading = false;
+  // Blinking live-update dot on the notifications bell. True only when a new
+  // billing/payment notification has arrived during this app session, and
+  // reset to false when the user opens the notifications screen.
+  bool _showLiveUpdate = false;
+  // Baseline used to distinguish "old" unread notifications (present on app
+  // start) from "new" ones that arrived while this screen is mounted. `-1`
+  // means the first poll hasn't seeded the baseline yet.
+  int _lastKnownCount = -1;
+  // Notification types that should trigger the live-update indicator.
+  static const Set<String> _liveUpdateTypes = {
+    'billing',
+    'payment',
+    'payments'
+  };
+  StreamSubscription<RemoteMessage>? _fcmSubscription;
+  Timer? _notificationsTimer;
   var _customer;
   late AppInfo _appInfo;
 
@@ -76,16 +92,22 @@ class _HomeState extends State<Home> {
   _displayMessage() {
     if (mounted) {
       if (widget.message != null) {
-        showBasicsFlash(context, widget.message, textColor: Constants.kAccentColor, bgColor: Constants.kWhiteColor);
+        showBasicsFlash(context, widget.message,
+            textColor: Constants.kAccentColor, bgColor: Constants.kWhiteColor);
       }
     }
   }
 
   _getAppInfo() {
-    _request.get(context, url: Endpoints.app_info_view.replaceFirst("{id}", "${Constants.appId}")).then((Map response) async {
+    _request
+        .get(context,
+            url: Endpoints.app_info_view
+                .replaceFirst("{id}", "${Constants.appId}"))
+        .then((Map response) async {
       try {
         if (response[Constants.success]) {
-          SharedPreferences _localStorage = await SharedPreferences.getInstance();
+          SharedPreferences _localStorage =
+              await SharedPreferences.getInstance();
           _localStorage.setString(Constants.paymentPercentageCharge, "0.00");
           _appInfo = AppInfo.map(response[Constants.response]);
           _checkForUpdate();
@@ -96,30 +118,76 @@ class _HomeState extends State<Home> {
 
   _checkForNotifications() {
     try {
-      Timer.periodic(Duration(seconds: 15), (Timer t) {
-        if (mounted) {
-          _request.get(context, url: Endpoints.notifications_check_numbers).then((Map response) async {
-            try {
-              if (response[Constants.success]) {
-                setState(() => _notificationCount = response[Constants.response]['notifications']);
-              }
-            } catch (e) {}
-          });
-        }
+      _notificationsTimer?.cancel();
+      _notificationsTimer = Timer.periodic(Duration(seconds: 15), (Timer t) {
+        if (!mounted) return;
+        _request
+            .get(context, url: Endpoints.notifications_check_numbers)
+            .then((Map response) async {
+          try {
+            if (!mounted) return;
+            if (response[Constants.success]) {
+              final int count =
+                  (response[Constants.response]['notifications'] as int?) ?? 0;
+              // The very first poll seeds the baseline so existing
+              // unread notifications on the server do NOT light up the
+              // indicator on app start. Any later increase in count means
+              // a new notification arrived while the app was running.
+              final bool isFirstLoad = _lastKnownCount == -1;
+              final bool increased = !isFirstLoad && count > _lastKnownCount;
+              setState(() {
+                _notificationCount = count;
+                _lastKnownCount = count;
+                if (increased) _showLiveUpdate = true;
+              });
+            }
+          } catch (e) {}
+        });
       });
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
+  // Foreground FCM listener. When a billing/payment push arrives while this
+  // screen is active, flip the live-update indicator on. The indicator is
+  // cleared when the user taps the bell (see onTap in build()).
+  void _listenForLiveNotifications() {
+    _fcmSubscription?.cancel();
+    _fcmSubscription =
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (!mounted) return;
+      final String? type = message.data['type'] as String?;
+      if (type != null && _liveUpdateTypes.contains(type.toLowerCase())) {
+        setState(() => _showLiveUpdate = true);
+      }
+    });
+  }
+
+  void _openNotifications() async {
+    if (mounted) setState(() => _showLiveUpdate = false);
+    await Navigator.pushNamed(context, Notifications.id);
+    // After the user returns from Notifications, the server will have marked
+    // everything read, so reset the baseline to the latest known count so
+    // subsequent polls correctly flag only brand-new arrivals.
+    if (mounted) {
+      setState(() {
+        _lastKnownCount = _notificationCount;
+      });
+    }
+  }
+
   _checkForUpdate() async {
     Map packageInfo = await getDevicePackageInfo();
     double newVersion;
-    double currentVersion = double.parse(packageInfo.values.toList()[2].trim().replaceAll(".", ""));
+    double currentVersion =
+        double.parse(packageInfo.values.toList()[2].trim().replaceAll(".", ""));
     if (Platform.isAndroid) {
-      newVersion = double.parse(_appInfo.minAndroidVersion.trim().replaceAll(".", ""));
+      newVersion =
+          double.parse(_appInfo.minAndroidVersion.trim().replaceAll(".", ""));
     } else {
-      newVersion = double.parse(_appInfo.minIosVersion.trim().replaceAll(".", ""));
+      newVersion =
+          double.parse(_appInfo.minIosVersion.trim().replaceAll(".", ""));
     }
     if (newVersion > currentVersion) {
       showVersionDialog(context, _appInfo.byForceUpdate.toString());
@@ -133,10 +201,13 @@ class _HomeState extends State<Home> {
     super.initState();
     _getAppInfo();
     _checkForNotifications();
+    _listenForLiveNotifications();
   }
 
   @override
   void dispose() {
+    _fcmSubscription?.cancel();
+    _notificationsTimer?.cancel();
     super.dispose();
   }
 
@@ -192,7 +263,8 @@ class _HomeState extends State<Home> {
               color: Constants.kPrimaryColor,
               child: AppBar(
                 systemOverlayStyle: SystemUiOverlayStyle(
-                  statusBarIconBrightness: Brightness.dark, // For Android (dark icons)
+                  statusBarIconBrightness:
+                      Brightness.dark, // For Android (dark icons)
                   statusBarBrightness: Brightness.light, // For iOS (dark icons)
                 ),
                 elevation: 0,
@@ -211,10 +283,13 @@ class _HomeState extends State<Home> {
                                 child: IconButton(
                                   onPressed: _handleMenuButtonPressed,
                                   iconSize: 24.sp,
-                                  icon: ValueListenableBuilder<AdvancedDrawerValue>(
+                                  icon: ValueListenableBuilder<
+                                      AdvancedDrawerValue>(
                                     valueListenable: _advancedDrawerController,
                                     builder: (context, value, child) {
-                                      return Icon(value.visible ? Icons.clear : Icons.menu);
+                                      return Icon(value.visible
+                                          ? Icons.clear
+                                          : Icons.menu);
                                     },
                                   ),
                                 ),
@@ -231,11 +306,10 @@ class _HomeState extends State<Home> {
                       Expanded(
                         child: Builder(builder: (BuildContext context) {
                           return CustomBadge(
+                            showLiveUpdate: _showLiveUpdate,
                             iconData: Icons.notifications_outlined,
                             alertCount: _notificationCount,
-                            onTap: () {
-                              Navigator.pushNamed(context, Notifications.id);
-                            },
+                            onTap: _openNotifications,
                           );
                         }),
                       )
@@ -259,7 +333,8 @@ class _HomeState extends State<Home> {
             elevation: 0,
             items: [
               FloatingNavbarItem(icon: Icons.home_filled, title: 'Home'),
-              FloatingNavbarItem(icon: Icons.question_answer_outlined, title: 'Help'),
+              FloatingNavbarItem(
+                  icon: Icons.question_answer_outlined, title: 'Help'),
               FloatingNavbarItem(icon: Icons.settings_sharp, title: 'Settings'),
             ],
           ),
